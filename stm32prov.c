@@ -15,7 +15,8 @@ static STM32_PROV_CTX *stm32_ctx_new(const OSSL_CORE_HANDLE *handle)
     /* data */
     STM32_PROV_CTX *ctx = OPENSSL_zalloc(sizeof(*ctx));
     if (ctx == NULL) return NULL;
-    ctx -> handle;
+    ctx -> handle = handle;
+    return ctx;
 }
 
 static void stm32_ctx_free(STM32_PROV_CTX *ctx)
@@ -74,7 +75,7 @@ static const OSSL_ALGORITHM *stm32_query(void *provctx, int operation_id, int *n
             break;
     }
     // si pas trouvé (provider ne supporte pas cet algo)
-    // ==> default ou fips provider : priorité à configurer dans openssl.cnf
+    // ========== > default ou fips provider : priorité a configurer dans openssl.cnf
     return NULL;
 }
 
@@ -105,9 +106,9 @@ int OSSL_provider_init(const OSSL_CORE_HANDLE *handle,
                        void                  **provctx)
 {
      
-    /* Pour l'instant on n'en a pas besoin —
-     * on ignorera tout avec le default du switch. 
+    /* pour l'instant on n'en a pas besoin
     */
+   // (void)in;
     for (; in->function_id != 0; in++) {
         switch (in->function_id) {
         default:
@@ -121,6 +122,5 @@ int OSSL_provider_init(const OSSL_CORE_HANDLE *handle,
 
     /* return dispatch table a OpenSSL */
     *out = stm32_dispatch_table;
-
     return 1;
 }
