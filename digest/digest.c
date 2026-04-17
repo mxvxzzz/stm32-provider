@@ -4,10 +4,11 @@
 #include <sys/socket.h>
 #include <linux/if_alg.h>
 
-#include<openssl/core.h>
-#include<openssl/core_dispatch.h>
-#include<openssl/core_names.h>
-#include<openssl/params.h>
+#include <openssl/core.h>
+#include <openssl/core_dispatch.h>
+#include <openssl/core_names.h>
+#include <openssl/params.h>
+#include "digest.h"
 
 /* kernel dasn if_alg.h
 struct sockaddr_alg {
@@ -97,7 +98,6 @@ static int sha256_init(void *vctx, const OSSL_PARAM params[])
     if (ctx == NULL)
         return 0;
 
-    /* 2-3... appel : ferme*/
     if (ctx->op_fd >= 0){
         close(ctx->op_fd);
         ctx->op_fd = -1;
@@ -117,7 +117,6 @@ static int sha256_update(void *vctx, const unsigned char *in, size_t inl)
     if (ctx == NULL)
         return 0;
 
-    /* sizeof(in) taill pointeur = 8bytes / inl : taille reel de data*/
     if (write(ctx->op_fd, in, inl) < 0)
         return 0;
     return 1;
@@ -129,17 +128,17 @@ static int sha256_final(void *vctx, unsigned char *out, size_t *outl, size_t out
     if (ctx == NULL)
         return 0;
 
-    if (outsz < 32) /* SHA256 output is 32 bytes*/
+    if (outsz < 32) 
         return 0;
     ssize_t r = read(ctx->op_fd, out, 32);
     if (r < 0){
         return 0;
     }
-    *outl = r; // pas utile ici mais pour SHA K quelque chose == possibilité de préciser l'output 
+    *outl = r;
     return 1;
 }
 
-// Openssl appelle pour ((==caracterstique de l'algo ))
+// caracteristique algo 
 static int sha256_get_params(OSSL_PARAM params[])
 {
     OSSL_PARAM *p;
@@ -171,3 +170,4 @@ static const OSSL_DISPATCH sha256_functions[] = {
         (void (*)(void))sha256_get_params},
     { 0, NULL }
 };
+
