@@ -1,29 +1,9 @@
-#include <openssl/core.h>
-#include <openssl/proverr.h>
+#ifndef ERR_H
+#define ERR_H
+#include <stdint.h>
+#include "prov/err.h"  /* libprov : proverr_new_error, proverr_set_error... */
 #include "prov.h"
-/*
-static const OSSL_ITEM reason_strings_dispatch[] = {
-    { VIGENERE_NO_KEYLEN_SET, "no key length has been set" },
-    { VIGENERE_ONGOING_OPERATION, "an operation is underway" },
-    { VIGENERE_INCORRECT_KEYLEN, "incorrect key length" },
-    { 0, NULL }
-};
-*/
-const OSSL_ITEM reason_strings_dispatch_digest[] = {
-    { PROV_R_DIGEST_NOT_ALLOWED, " " },
-    { PROV_R_INVALID_DIGEST, "" },
-    { PROV_R_INVALID_DIGEST_LENGTH, "incorrect digest length" },
-    { PROV_R_INVALID_DIGEST_SIZE, "incorrect digest size"},
-    { PROV_R_INVALID_X931_DIGEST, " "},
-    { PROV_R_MISSING_MESSAGE_DIGEST, " "},
-    { PROV_R_XOF_DIGESTS_NOT_ALLOWED, " "},
-    { 0, NULL }
-};
 
-/* Codes d'erreur provider by me
- * j'ai trouvé libprov wrapper des erreurs de providers qui vient de core openssl 
- * je doit chercher a ce point laquelle et comment je vais mapper les erreurs 
-*/
 enum {
   STM32_R_INIT_FAILED = 1,
   STM32_R_INVALID_ARGUMENT,
@@ -34,16 +14,41 @@ enum {
   STM32_R_HASH_UPDATE_FAILED,
   STM32_R_HASH_FINAL_FAILED,
   STM32_R_OUTPUT_BUFFER_TOO_SMALL,
-  STM32_R_UNSUPPORTED_OPERATION
+  STM32_R_UNSUPPORTED_OPERATION,
+  STM32_R_AFALG_FAILED,
 };
 
-const OSSL_ITEM *get_reason_strings(void);
+/* macro pour lever une erreur depuis n'importe quel fichier
+ * ex: PUT_ERROR(ctx->provctx, STM32_R_HASH_INIT_FAILED, NULL)
+ * ex: PUT_ERROR(ctx->provctx, STM32_R_INVALID_ARGUMENT,
+ *               "taille=%zu", size)
+ */
+#define PUT_ERROR(pctx, reason, fmt, ...)                           \
+    do {                                                            \
+        proverr_new_error(ERR_HANDLE(pctx));                        \
+        proverr_set_error_debug(ERR_HANDLE(pctx),                   \
+                                __FILE__, __LINE__, __func__);      \
+        proverr_set_error(ERR_HANDLE(pctx), (reason), (fmt),       \
+                          ##__VA_ARGS__);                           \
+    } while (0)
 
+/* macro pour lever une erreur avec le message errno courant */
+#define PUT_ERROR_ERRNO(pctx, reason, what)                         \
+    do {                                                            \
+        int _saved_errno = errno;                                   \
+        PUT_ERROR((pctx), (reason), "%s failed: %s",                \
+                  (what), strerror(_saved_errno));                  \
+    } while (0)
+
+
+/*
 void stm32_put_error(const PROV_CTX *ctx, uint32_t reason,
                      const char *file, int line, const char *func,
                      const char *fmt, ...);
 
-/* helper like OSSL_FUNC_*   */                    
+// helper like OSSL_FUNC_*  
 #define PUT_ERROR(ctx, reason, fmt, ...)                                        \
   stm32_put_error((ctx), (reason), __FILE__, __LINE__, __func__, (fmt),         \
                   ##__VA_ARGS__)
+*/
+#endif /* ERR_H */

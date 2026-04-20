@@ -5,41 +5,26 @@
 #include<openssl/proverr.h>
 #include<openssl/core.h>
 
-
-struct proverr_functions_st{
-    const OSSL_CORE_HANDLE *core_handle;
-    OSSL_FUNC_core_new_error_fn *core_new_error;
-    OSSL_FUNC_core_set_error_debug_fn *core_set_error_fn;
-    OSSL_FUNC_core_vset_error_fn *core_vset_error_fn;
-};
-
+typedef struct proverr_functions_st PROV_ERR;
 struct provider_ctx_st {
     const OSSL_CORE_HANDLE *core_handle;
+    PROV_ERR *proverr_handle;
 };
-
 typedef struct provider_ctx_st PROV_CTX;
 
-/* 
- * Functions ctx
- *
- */
+/* macro d'accès au handle d'erreur — inspirée de vigenere */
+#define ERR_HANDLE(pctx) ((pctx)->proverr_handle)
 
-PROV_CTX *provider_ctx_new(const OSSL_CORE_HANDLE *core_handle);
-
+/* Functions ctx of provider */
+PROV_CTX *provider_ctx_new(const OSSL_CORE_HANDLE *core_handle, 
+                           const OSSL_DISPATCH *in);
 void provider_ctx_free(PROV_CTX *ctx);
 
-
-
-//struct provider_err_funcs {}
-
-/*
- *  table of algo supported
-*/
-
+/* Algorithms supported */
 extern const OSSL_ALGORITHM stm32_digests[];
-extern const OSSL_ITEM reason_strings_dispatch_digest[];
-
 //extern const OSSL_ALGORITHM stm32_cipher[];
 
+/* Strings error supported / names coherent avec err.c */
+extern const OSSL_ITEM stm32_reason_strings[];
 
 #endif /* PROV_H */

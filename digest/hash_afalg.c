@@ -1,6 +1,6 @@
 #include <string.h>
 #include <unistd.h>
-
+#include <errno.h>
 #include <sys/socket.h>
 #include <linux/if_alg.h>
 
@@ -9,43 +9,32 @@
 #include <openssl/core_names.h>
 #include <openssl/params.h>
 #include "digest.h"
+#include "../include/err.h"
 
-/* kernel dasn if_alg.h
-struct sockaddr_alg {
-    __u16   salg_family;    
-    __u8    salg_type[14];  
-    __u32   salg_feat;
-    __u32   salg_mask;
-    __u8    salg_name[64];  
-};
-*/
-/* standard c99*/
-struct sockaddr_alg {
-    uint16_t salg_family;   
-    uint8_t  salg_type[14]; 
-    uint32_t salg_feat;     
-    uint32_t salg_mask;
-    uint8_t  salg_name[64];
-};
+#define SHA256_DIGEST_SIZE 32
+#define SHA256_BLOCK_SIZE  64
 
 struct stm32_sha256_ctx_st {
+    PROV_CTX *provctx;
     int tf_fd;   
     int op_fd;   
 };
-
 typedef struct stm32_sha256_ctx_st STM32_SHA256_CTX;
 
-static void *sha256_newctx(void *provctx)
+static void *sha256_newctx(void *vprovctx)
 {
     STM32_SHA256_CTX *ctx = OPENSSL_zalloc(sizeof(*ctx));
-    if (ctx == NULL)
+    if (ctx == NULL){
         return NULL;
+    }
 
+    ctx->provctx = (PROV_CTX *)vprovctx;
     ctx->tf_fd = -1;
     ctx->op_fd = -1;
 
     ctx->tf_fd = socket(AF_ALG, SOCK_SEQPACKET, 0);
     if (ctx->tf_fd < 0) {
+        PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_NEWCTX_FAILED, "AF_ALG socket failed");
         OPENSSL_free(ctx);
         return NULL;
     }
@@ -57,20 +46,13 @@ static void *sha256_newctx(void *provctx)
     };
 
     if (bind(ctx->tf_fd, (struct sockaddr *)&sa, sizeof(sa)) < 0) {
+        PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_NEWCTX_FAILED, "AF_ALG bind failed");
         close(ctx->tf_fd);
         OPENSSL_free(ctx);
         return NULL;
     }
 
-    /* op_fd sera cree dans init()
-    ctx->op_fd = accept(ctx->tf_fd, NULL, NULL);
-    if (ctx->op_fd < 0) {
-        close(ctx->tf_fd);
-        OPENSSL_free(ctx);
-        return NULL;
-    }*/
-
-    (void)provctx;
+    (void)vprovctx;
     return ctx;
 }
 
@@ -80,7 +62,7 @@ static void sha256_freectx(void *vctx)
     STM32_SHA256_CTX *ctx = (STM32_SHA256_CTX *)vctx; /*cast */
 
     if (ctx == NULL)
-        return NULL;
+        return;
 
     if (ctx->op_fd >= 0)
         close(ctx->op_fd);
@@ -105,6 +87,7 @@ static int sha256_init(void *vctx, const OSSL_PARAM params[])
 
     ctx->op_fd = accept(ctx->tf_fd, NULL, NULL);
     if (ctx->op_fd < 0) {
+        PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_INIT_FAILED, "AF_ALG accept failed");
         return 0;
     }
     (void)params;
@@ -117,8 +100,10 @@ static int sha256_update(void *vctx, const unsigned char *in, size_t inl)
     if (ctx == NULL)
         return 0;
 
-    if (write(ctx->op_fd, in, inl) < 0)
+    if (write(ctx->op_fd, in, inl) < 0){
+        PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_UPDATE_FAILED, "AF_ALG write failed");
         return 0;
+    }
     return 1;
 }
 
@@ -128,10 +113,14 @@ static int sha256_final(void *vctx, unsigned char *out, size_t *outl, size_t out
     if (ctx == NULL)
         return 0;
 
-    if (outsz < 32) 
+    if (outsz < 32){
+        //proverr_set_error_debug(ctx->provctx, *file, *line, *name_function);   <== libprov / vigenere
+        PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_FINAL_FAILED, "AF_ALG buffer(SHA256) output is < 32");
         return 0;
+    }
     ssize_t r = read(ctx->op_fd, out, 32);
     if (r < 0){
+        PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_FINAL_FAILED, "AF_ALG read failed");
         return 0;
     }
     *outl = r;
@@ -154,8 +143,20 @@ static int sha256_get_params(OSSL_PARAM params[])
     return 1;
 }
 
+/* list of params supported */
+static const OSSL_PARAM sha256_gettable_params[] = {
+    OSSL_PARAM_size_t(OSSL_DIGEST_PARAM_BLOCK_SIZE, NULL),
+    OSSL_PARAM_size_t(OSSL_DIGEST_PARAM_SIZE, NULL),
+    OSSL_PARAM_END
+};
 
-static const OSSL_DISPATCH sha256_functions[] = {
+static const OSSL_PARAM *digests_gettable_params(void *provctx)
+{
+    (void)provctx;
+    return sha256_gettable_params;
+}
+
+const OSSL_DISPATCH sha256_functions[] = {
     { OSSL_FUNC_DIGEST_NEWCTX,
         (void (*)(void))sha256_newctx    },
     { OSSL_FUNC_DIGEST_FREECTX,
@@ -166,6 +167,8 @@ static const OSSL_DISPATCH sha256_functions[] = {
         (void (*)(void))sha256_update    },
     { OSSL_FUNC_DIGEST_FINAL,
         (void (*)(void))sha256_final     },
+    { OSSL_FUNC_DIGEST_GETTABLE_PARAMS, 
+        (void (*)(void))digests_gettable_params},
     { OSSL_FUNC_DIGEST_GET_PARAMS,
         (void (*)(void))sha256_get_params},
     { 0, NULL }

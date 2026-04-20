@@ -1,5 +1,5 @@
-#ifndef CRYPTO_APP_H
-#define CRYPTO_APP_H
+#ifndef CRYPTO_MEM_H
+#define CRYPTO_MEM_H
 
 /*
  * Forward declarations to ensure we get signatures right.  All the
