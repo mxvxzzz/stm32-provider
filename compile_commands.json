@@ -1,0 +1,20 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-fPIC",
+      "-I.",
+      "-I./include",
+      "-I./libprov/include",
+      "-c",
+      "-o",
+      "digest/hash_afalg.o",
+      "digest/hash_afalg.c"
+    ],
+    "directory": "/local/home/tabkioum/stm32-provider",
+    "file": "/local/home/tabkioum/stm32-provider/digest/hash_afalg.c",
+    "output": "/local/home/tabkioum/stm32-provider/digest/hash_afalg.o"
+  }
+]
