@@ -1,0 +1,74 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-fPIC",
+      "-I.",
+      "-I./include",
+      "-I./libprov/include",
+      "-c",
+      "-o",
+      "prov.o",
+      "prov.c"
+    ],
+    "directory": "/local/home/tabkioum/stm32-provider",
+    "file": "/local/home/tabkioum/stm32-provider/prov.c",
+    "output": "/local/home/tabkioum/stm32-provider/prov.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-fPIC",
+      "-I.",
+      "-I./include",
+      "-I./libprov/include",
+      "-c",
+      "-o",
+      "err.o",
+      "err.c"
+    ],
+    "directory": "/local/home/tabkioum/stm32-provider",
+    "file": "/local/home/tabkioum/stm32-provider/err.c",
+    "output": "/local/home/tabkioum/stm32-provider/err.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-fPIC",
+      "-I.",
+      "-I./include",
+      "-I./libprov/include",
+      "-c",
+      "-o",
+      "digest/digest.o",
+      "digest/digest.c"
+    ],
+    "directory": "/local/home/tabkioum/stm32-provider",
+    "file": "/local/home/tabkioum/stm32-provider/digest/digest.c",
+    "output": "/local/home/tabkioum/stm32-provider/digest/digest.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-fPIC",
+      "-I.",
+      "-I./include",
+      "-I./libprov/include",
+      "-c",
+      "-o",
+      "digest/hash_afalg.o",
+      "digest/hash_afalg.c"
+    ],
+    "directory": "/local/home/tabkioum/stm32-provider",
+    "file": "/local/home/tabkioum/stm32-provider/digest/hash_afalg.c",
+    "output": "/local/home/tabkioum/stm32-provider/digest/hash_afalg.o"
+  }
+]
