@@ -1,3 +1,4 @@
 *.o
 *.so
 text.txt
+compile_commands.json
