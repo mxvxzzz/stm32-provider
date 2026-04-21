@@ -27,7 +27,7 @@ struct stm32_hash_ctx_st {
     int tf_fd;   
     int op_fd;
     const char *alg_name;
-    size_t digest_size;  
+    size_t digest_len;  
 };
 
 /*********************************************************************
@@ -110,8 +110,8 @@ static int stm32_afalg_send_all(PROV_CTX *provctx, int fd,
  *  Setup
  *
  *****/
-void *stm32_hash_newctx(void *vprovctx, const char *alg_name,
-                                  size_t digest_size)
+STM32_HASH_CTX *stm32_hash_newctx(void *vprovctx, const char *alg_name,
+                                  size_t digest_len)
 {
     PROV_CTX *provctx = (PROV_CTX *)vprovctx;
     STM32_HASH_CTX *ctx;
@@ -119,7 +119,7 @@ void *stm32_hash_newctx(void *vprovctx, const char *alg_name,
     if (provctx == NULL)
         return NULL;
 
-    if (alg_name == NULL || digest_size == 0) {
+    if (alg_name == NULL || digest_len == 0) {
         PUT_ERROR(provctx, STM32_R_INVALID_ARGUMENT,
                   "invalid hash newctx arguments");
         return NULL;
@@ -140,19 +140,17 @@ void *stm32_hash_newctx(void *vprovctx, const char *alg_name,
     ctx->provctx = provctx;
     ctx->tf_fd = -1;
     ctx->op_fd = -1;
-    ctx->digest_size = digest_size;
+    ctx->digest_len = digest_len;
     ctx->alg_name = alg_name;
 
     ctx->tf_fd = stm32_afalg_open_tfm(provctx, alg_name);
     if (ctx->tf_fd < 0) {
-        //PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_NEWCTX_FAILED, "AF_ALG socket failed");
         OPENSSL_free(ctx);
         return NULL;
     }
     return ctx;
 }
 
-/* signature ok(core_dipatch exigence) donc cast */
 void stm32_hash_freectx(STM32_HASH_CTX *ctx)
 {
     if (ctx == NULL)
@@ -164,7 +162,7 @@ void stm32_hash_freectx(STM32_HASH_CTX *ctx)
 }
 
 
-static int stm32_hash_init(void ctx)
+int stm32_hash_init(STM32_HASH_CTX *ctx)
 {
     if (ctx == NULL)
         return 0;
@@ -183,11 +181,10 @@ static int stm32_hash_init(void ctx)
         PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_INIT_FAILED, "AF_ALG accept failed");
         return 0;
     }
-    (void)params;
     return 1;
 }
 
-int stm32_hash_update(void *ctx, const unsigned char *in, size_t inl)
+int stm32_hash_update(STM32_HASH_CTX *ctx, const unsigned char *in, size_t inl)
 {
     if (ctx == NULL)
         return 0;
@@ -210,7 +207,7 @@ int stm32_hash_update(void *ctx, const unsigned char *in, size_t inl)
     return stm32_afalg_send_all(ctx->provctx, ctx->op_fd, in, inl);
 }
 
-int stm32_hash_final(void *vctx, unsigned char *out, size_t *outl)
+int stm32_hash_final(STM32_HASH_CTX *ctx, unsigned char *out, size_t *outl)
 {
     ssize_t r;
     if (ctx == NULL)
@@ -228,7 +225,7 @@ int stm32_hash_final(void *vctx, unsigned char *out, size_t *outl)
         return 0;
     }
 
-    ssize_t r = read(ctx->op_fd, out, ctx->digest_len);
+    r = read(ctx->op_fd, out, ctx->digest_len);
     if (r < 0){
         PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_FINAL_FAILED, "AF_ALG read failed");
         return 0;
