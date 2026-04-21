@@ -1,4 +1,5 @@
 *.o
 *.so
+*.d
 text.txt
 compile_commands.json
