@@ -5,6 +5,7 @@
 #include<openssl/proverr.h>
 #include<openssl/core.h>
 
+
 typedef struct proverr_functions_st PROV_ERR;
 struct provider_ctx_st {
     const OSSL_CORE_HANDLE *core_handle;
@@ -12,7 +13,7 @@ struct provider_ctx_st {
 };
 typedef struct provider_ctx_st PROV_CTX;
 
-/* macro d'accès au handle d'erreur — inspirée de vigenere */
+/* Macro to access the error handle (( vigenere ))*/
 #define ERR_HANDLE(pctx) ((pctx)->proverr_handle)
 
 /* Functions ctx of provider */
@@ -24,7 +25,7 @@ void provider_ctx_free(PROV_CTX *ctx);
 extern const OSSL_ALGORITHM stm32_digests[];
 //extern const OSSL_ALGORITHM stm32_cipher[];
 
-/* Strings error supported / names coherent avec err.c */
+/* Strings error supported / names coherent with err.c */
 extern const OSSL_ITEM stm32_reason_strings[];
 
 #endif /* PROV_H */

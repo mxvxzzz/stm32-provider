@@ -18,7 +18,7 @@ enum {
   STM32_R_AFALG_FAILED,
 };
 
-/* macro pour lever une erreur depuis n'importe quel fichier
+/* Macro to raise an error in the provider with a custom message. // already defined in libprov / vigenere
  * ex: PUT_ERROR(ctx->provctx, STM32_R_HASH_INIT_FAILED, NULL)
  * ex: PUT_ERROR(ctx->provctx, STM32_R_INVALID_ARGUMENT,
  *               "taille=%zu", size)

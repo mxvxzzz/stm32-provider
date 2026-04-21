@@ -3,9 +3,9 @@
 #include "include/err.h"
 #include "include/prov.h"
 
-/* Tableau global des messages d'erreur du provider ST.
- * PROV_R_* : codes standard OpenSSL pour les algos connus
- * STM32_R_* : codes custom définis dans err.h
+/* Table of error messages for the STM32 provider.
+ * PROV_R_* : Error codes from OpenSSL (proverr.h)
+ * STM32_R_* : Error codes specific to the STM32 provider (err.h)
  */
 const OSSL_ITEM stm32_reason_strings[] = {
     /* digest */
