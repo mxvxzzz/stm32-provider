@@ -11,12 +11,18 @@
 #include "../include/err.h"
 
 
-/* prototypes of functions / / static */
-static void  stm32_afalg_close_fd(int *fd);
+/* prototypes AF_ALG helpers / / static */
+static void stm32_afalg_close_fd(int *fd);
 static int stm32_afalg_open_tfm(PROV_CTX *provctx, const char *alg_name);
 static int stm32_afalg_open_op(PROV_CTX *provctx, int tf_fd);
 static int stm32_afalg_send_all(PROV_CTX *provctx, int fd,
-                                const unsigned char *buf, size_t len);
+                                const unsigned char *buf, 
+                                size_t len, int flags);
+static void stm32_afalg_clear_pending(STM32_HASH_CTX *ctx);
+static int stm32_afalg_store_pending(STM32_HASH_CTX *ctx,
+                                     const unsigned char *in, size_t inl);
+static int stm32_afalg_flush_pending_more(STM32_HASH_CTX *ctx);
+static int stm32_afalg_flush_pending_final(STM32_HASH_CTX *ctx);                                
 /*********************************************************************
  *
  *  Contexte OpenSSL for digest operation using AF_ALG
@@ -27,7 +33,9 @@ struct stm32_hash_ctx_st {
     int tf_fd;   
     int op_fd;
     const char *alg_name;
-    size_t digest_len;  
+    size_t digest_len;
+    unsigned char *pending;
+    size_t pending_len;
 };
 
 /*********************************************************************
@@ -82,32 +90,112 @@ static int stm32_afalg_open_op(PROV_CTX *provctx, int tf_fd)
 }
 
 static int stm32_afalg_send_all(PROV_CTX *provctx, int fd,
-                                const unsigned char *buf, size_t len)
+                                const unsigned char *buf, 
+                                size_t len, int flags)
 {
     size_t off = 0;
     ssize_t written;
 
     while (off < len) {
-        written = write(fd, buf + off, len - off);
+        written = send(fd, buf + off, len - off, flags);
         if (written < 0) {
-            PUT_ERROR_ERRNO(provctx, STM32_R_HASH_UPDATE_FAILED, "AF_ALG write");
+            PUT_ERROR_ERRNO(provctx, STM32_R_HASH_UPDATE_FAILED, "AF_ALG send");
             return 0;
         }
         if (written == 0) {
             PUT_ERROR(provctx, STM32_R_HASH_UPDATE_FAILED,
-                      "short write on AF_ALG socket");
+                      "short send on AF_ALG socket");
             return 0;
         }
         off += (size_t)written;
+        if (off < len)
+            flags = MSG_MORE;
     }
 
     return 1;
 }
 
+static void stm32_afalg_clear_pending(STM32_HASH_CTX *ctx)
+{
+    if (ctx == NULL)
+        return;
+
+    OPENSSL_clear_free(ctx->pending, ctx->pending_len);
+    ctx->pending = NULL;
+    ctx->pending_len = 0;
+}
+
+static int stm32_afalg_store_pending(STM32_HASH_CTX *ctx,
+                                     const unsigned char *in, size_t inl)
+{
+    unsigned char *buf;
+
+    if (ctx == NULL)
+        return 0;
+
+    stm32_afalg_clear_pending(ctx);
+
+    if (inl == 0)
+        return 1;
+
+    buf = OPENSSL_malloc(inl);
+    if (buf == NULL) {
+        PUT_ERROR(ctx->provctx, STM32_R_HASH_UPDATE_FAILED,
+                  "failed to allocate pending buffer");
+        return 0;
+    }
+
+    memcpy(buf, in, inl);
+    ctx->pending = buf;
+    ctx->pending_len = inl;
+    return 1;
+}
+
+static int stm32_afalg_flush_pending_more(STM32_HASH_CTX *ctx)
+{
+    if (ctx == NULL)
+        return 0;
+
+    if (ctx->pending == NULL || ctx->pending_len == 0)
+        return 1;
+
+    if (!stm32_afalg_send_all(ctx->provctx, ctx->op_fd,
+                              ctx->pending, ctx->pending_len, MSG_MORE))
+        return 0;
+
+    stm32_afalg_clear_pending(ctx);
+    return 1;
+}
+
+static int stm32_afalg_flush_pending_final(STM32_HASH_CTX *ctx)
+{
+    if (ctx == NULL)
+        return 0;
+
+    /*
+     * Empty message case:
+     * no update() was called, finalize by sending an empty buffer without
+     * MSG_MORE.
+     */
+    if (ctx->pending == NULL) {
+        if (!stm32_afalg_send_all(ctx->provctx, ctx->op_fd,
+                                  (const unsigned char *)"", 0, 0))
+            return 0;
+        return 1;
+    }
+
+    if (!stm32_afalg_send_all(ctx->provctx, ctx->op_fd,
+                              ctx->pending, ctx->pending_len, 0))
+        return 0;
+
+    stm32_afalg_clear_pending(ctx);
+    return 1;
+}
 
 /*********************************************************************
  *
  *  Setup
+ *  Public Interface used by digest.c
  *
  *****/
 STM32_HASH_CTX *stm32_hash_newctx(void *vprovctx, const char *alg_name,
@@ -132,16 +220,13 @@ STM32_HASH_CTX *stm32_hash_newctx(void *vprovctx, const char *alg_name,
         return NULL;
     }
 
-    ctx = OPENSSL_zalloc(sizeof(*ctx));
-    if (ctx == NULL){
-        return NULL;
-    }
-
     ctx->provctx = provctx;
     ctx->tf_fd = -1;
     ctx->op_fd = -1;
     ctx->digest_len = digest_len;
     ctx->alg_name = alg_name;
+    ctx->pending = NULL;
+    ctx->pending_len = 0;
 
     ctx->tf_fd = stm32_afalg_open_tfm(provctx, alg_name);
     if (ctx->tf_fd < 0) {
@@ -156,29 +241,27 @@ void stm32_hash_freectx(STM32_HASH_CTX *ctx)
     if (ctx == NULL)
         return;
 
+    stm32_afalg_clear_pending(ctx);
     stm32_afalg_close_fd(&ctx->op_fd);
     stm32_afalg_close_fd(&ctx->tf_fd);
     OPENSSL_free(ctx);
 }
-
 
 int stm32_hash_init(STM32_HASH_CTX *ctx)
 {
     if (ctx == NULL)
         return 0;
 
-    if (ctx->op_fd >= 0){
+    if (ctx->tf_fd >= 0){
         PUT_ERROR(ctx->provctx, STM32_R_HASH_INIT_FAILED,
                   "invalid AF_ALG transform socket");
-        close(ctx->op_fd);
-        ctx->op_fd = -1;
     }
 
+    stm32_afalg_clear_pending(ctx);
     stm32_afalg_close_fd(&ctx->op_fd);
 
     ctx->op_fd = stm32_afalg_open_op(ctx->provctx, ctx->tf_fd);
     if (ctx->op_fd < 0) {
-        PUT_ERROR_ERRNO(ctx->provctx, STM32_R_HASH_INIT_FAILED, "AF_ALG accept failed");
         return 0;
     }
     return 1;
@@ -204,7 +287,17 @@ int stm32_hash_update(STM32_HASH_CTX *ctx, const unsigned char *in, size_t inl)
         return 0;
     }
 
-    return stm32_afalg_send_all(ctx->provctx, ctx->op_fd, in, inl);
+    /*
+     * Keep the latest chunk pending.
+     * If a previous pending chunk exists, 
+     * it is definitely not the final one, so flush it with MSG_MORE.
+     */
+    if (ctx->pending != NULL) {
+        if (!stm32_afalg_flush_pending_more(ctx))
+            return 0;
+    }
+
+    return stm32_afalg_store_pending(ctx, in, inl);
 }
 
 int stm32_hash_final(STM32_HASH_CTX *ctx, unsigned char *out, size_t *outl)
@@ -224,6 +317,13 @@ int stm32_hash_final(STM32_HASH_CTX *ctx, unsigned char *out, size_t *outl)
                   "output buffer or output length is NULL");
         return 0;
     }
+
+    /*
+     * Finalize the message by flushing the last pending chunk without
+     * MSG_MORE. If no update() happened, finalize the empty message.
+     */
+    if (!stm32_afalg_flush_pending_final(ctx))
+        return 0;
 
     r = read(ctx->op_fd, out, ctx->digest_len);
     if (r < 0){
