@@ -3,8 +3,7 @@
 #include <openssl/core_names.h>
 #include <openssl/params.h>
 #include "include/prov.h"
-#include "prov/err.h"   // libprov — proverr_new_handle, proverr_free_handle
-
+#include "include/err.h"   // libprov — proverr_new_handle, proverr_free_handle
 
 /* forward declarations with types OSSL_FUNC_**/
 static OSSL_FUNC_provider_gettable_params_fn prov_gettable_params;
