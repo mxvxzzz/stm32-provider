@@ -108,10 +108,7 @@ static int stm32_afalg_send_all(PROV_CTX *provctx, int fd,
             return 0;
         }
         off += (size_t)written;
-        if (off < len)
-            flags = MSG_MORE;
     }
-
     return 1;
 }
 
@@ -252,9 +249,10 @@ int stm32_hash_init(STM32_HASH_CTX *ctx)
     if (ctx == NULL)
         return 0;
 
-    if (ctx->tf_fd >= 0){
+    if (ctx->tf_fd < 0){
         PUT_ERROR(ctx->provctx, STM32_R_HASH_INIT_FAILED,
                   "invalid AF_ALG transform socket");
+        return 0;
     }
 
     stm32_afalg_clear_pending(ctx);
