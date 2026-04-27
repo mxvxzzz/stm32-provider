@@ -4,17 +4,10 @@
 
 #include <openssl/core.h>
 
-/*********************************************************************
- *
- *  Operations digest AF_ALG 
- *  socket context / binding / accept / send / read
- *****/
-
-/* Opaque type for the AF_ALG hash context 
+/* Opaque type for the AF_ALG / Cryptodev hash context 
  *
  *  Provider global context
- *      PROV_CTX
- *          └── proverr_handle
+ *          └── PROV_CTX
  *
  *  Hash operation context
  *      STM32_HASH_CTX
@@ -25,7 +18,7 @@ typedef struct stm32_hash_ctx_st STM32_HASH_CTX;
 
 /*********************************************************************
  *
- *  AF_ALG hash interface used by digest.c 
+ *  AF_ALG / Cryptodev hash interface used by digest.c 
  *
  *****/
 STM32_HASH_CTX *stm32_hash_newctx(void *provctx, const char *alg_name,

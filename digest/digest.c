@@ -189,35 +189,41 @@ DEFINE_DIGEST(sha224,   "sha224",   28,  64);
 DEFINE_DIGEST(sha256,   "sha256",   32,  64);
 DEFINE_DIGEST(sha384,   "sha384",   48, 128);
 DEFINE_DIGEST(sha512,   "sha512",   64, 128);
+#ifdef BACKEND_AFALG
+DEFINE_DIGEST(sha3_224, "sha3-224", 28, 144);
 DEFINE_DIGEST(sha3_256, "sha3-256", 32, 136);
 DEFINE_DIGEST(sha3_384, "sha3-384", 48, 104);
 DEFINE_DIGEST(sha3_512, "sha3-512", 64,  72);
-
+#endif
 /* Table of supported digest algorithms returned by the provider to the Core OpenSSL */
 const OSSL_ALGORITHM stm32_digests[] = {
     { STM32_NAME_SHA1,     STM32_PROV_PROPS, sha1_functions,
-      "STM32 SHA-1 via AF_ALG" },
+      "STM32 SHA-1"},
 
     { STM32_NAME_SHA2_224, STM32_PROV_PROPS, sha224_functions,
-      "STM32 SHA-224 via AF_ALG" },
+      "STM32 SHA-224"},
 
     { STM32_NAME_SHA2_256, STM32_PROV_PROPS, sha256_functions,
-      "STM32 SHA-256 via AF_ALG" },
+      "STM32 SHA-256"},
 
     { STM32_NAME_SHA2_384, STM32_PROV_PROPS, sha384_functions,
-      "STM32 SHA-384 via AF_ALG" },
+      "STM32 SHA-384"},
 
     { STM32_NAME_SHA2_512, STM32_PROV_PROPS, sha512_functions,
-      "STM32 SHA-512 via AF_ALG" },
+      "STM32 SHA-512"},
+
+    #ifdef BACKEND_AFALG
+    { STM32_NAME_SHA3_224, STM32_PROV_PROPS, sha3_224_functions,
+      "STM32 SHA3-224"},
 
     { STM32_NAME_SHA3_256, STM32_PROV_PROPS, sha3_256_functions,
-      "STM32 SHA3-256 via AF_ALG" },
+      "STM32 SHA3-256"},
 
     { STM32_NAME_SHA3_384, STM32_PROV_PROPS, sha3_384_functions,
-      "STM32 SHA3-384 via AF_ALG" },
+      "STM32 SHA3-384"},
 
     { STM32_NAME_SHA3_512, STM32_PROV_PROPS, sha3_512_functions,
-      "STM32 SHA3-512 via AF_ALG" },
-
+      "STM32 SHA3-512"},
+    #endif
     { NULL, NULL, NULL, NULL }
 };

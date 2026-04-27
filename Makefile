@@ -22,14 +22,29 @@
 
 #CC = aarch64-ostl-linux-gcc
 PKG_CONFIG ?= pkg-config
-BUILD ?= dev
+
+# config ( dev / release ) ( afalg / cryptodev )
+BUILD ?= release
+BACKEND ?= afalg
+
 TARGET = stm32_provider.so
 SRCS = prov.c \
        err.c \
        digest/digest.c \
-       digest/hash_afalg.c \
        libprov/err.c \
        libprov/num.c
+
+ifeq ($(BACKEND),afalg)
+SRCS += digest/hash_afalg.c
+CPPFLAGS += -DBACKEND_AFALG # SHA3 in digest.c
+endif
+
+ifeq ($(BACKEND),cryptodev)
+SRCS += digest/hash_cryptodev.c
+CPPFLAGS += -I./warning/include # tempo(SDK)  -I/usr/local/include/
+CPPFLAGS += -DBACKEND_CRYPTODEV # SHA3 not available for cryptodev / in digest.c
+endif
+
 OBJS = $(SRCS:.c=.o)
 DEPS = $(OBJS:.o=.d)
 
