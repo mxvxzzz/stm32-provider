@@ -87,3 +87,20 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 - Verbose provider information
 
   `openssl list -provider-path . -provider stm32_provider -providers -verbose`
+
+- Set the environment variable `OPENSSL_MODULES` to the directory containing the provider shared library without `-provider-path`.
+  Example:
+
+  `export OPENSSL_MODULES=$HOME/your_module_directory`
+
+- Compute a SHA256 digest with this provider
+
+  `openssl dgst -provider stm32_provider -propquery "provider=stm32" -sha256 /file.txt`
+
+- Benchmark using openssl speed of SHA3-512 with this provider
+
+  `openssl speed -provider stm32_provider -propquery "provider=stm32" -evp sha3-512`
+
+- You can also use options such as `-seconds`, `-elapsed`, and `-bytes` to customize the benchmark. For more details, refer to the `openssl speed` documentation.
+
+  `openssl speed -seconds 10 -elapsed -bytes 8192 -provider stm32_provider -propquery "provider=stm32" sha256`
