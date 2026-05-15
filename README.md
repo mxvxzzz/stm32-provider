@@ -97,8 +97,8 @@ graph TD
     end
 
     App --> OpenSSL
-    OpenSSL -- "Netlink" --> AF_ALG
-    OpenSSL -- "ioctl" --> DevCrypto
+    OpenSSL --> AF_ALG
+    OpenSSL --> DevCrypto
     
     AF_ALG --> Core
     DevCrypto --> Cryptodev
@@ -116,7 +116,8 @@ graph TD
     style User_Space fill:none,stroke:#4472C4,stroke-dasharray: 5 5
     style Kernel_Space fill:none,stroke:#4472C4,stroke-dasharray: 5 5
     style HW_Layer fill:none,stroke:#4472C4,stroke-dasharray: 5 5
-
+    
+    linkStyle default stroke:#CC00CC,stroke-width:2px;
 ```
 
 ## How to load the provider
