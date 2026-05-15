@@ -94,3 +94,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 - You can also use options such as `-seconds`, `-elapsed`, and `-bytes` to customize the benchmark. For more details, refer to the `openssl speed` documentation.
 
   `openssl speed -seconds 10 -elapsed -bytes 8192 -provider stm32_provider -propquery "provider=stm32" sha256`
+
+## Benchmark Results
+You can view the latest performance reports for SHA-1, SHA-256, and SHA-512 here:
+👉 [View Live Benchmark Report](https://mxvxzzz.github.io/stm32-provider/bench/st_sha_benchmark.html)
