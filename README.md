@@ -59,66 +59,7 @@ The project is split into clear layers:
 
 ## Architecture diagram
 
-```mermaid
-graph TD
-    classDef userApp fill:#92D050,stroke:#6AAF50,color:#fff,font-weight:bold;
-    classDef community fill:#1F3864,stroke:#1F3864,color:#fff,font-weight:bold;
-    classDef st_driver fill:#00B0F0,stroke:#007ACC,color:#fff,font-weight:bold;
-    classDef hardware fill:#808080,stroke:#555555,color:#fff,font-weight:bold;
-    classDef interface fill:#fff,stroke:#CC00CC,color:#CC00CC,font-size:10px;
-
-    subgraph User_Space [User space]
-        App["Client Application"]:::userApp
-        OpenSSL["OpenSSL"]:::community
-    end
-
-    subgraph Kernel_Space [Kernel space]
-        AF_ALG(("AF_ALG")):::interface
-        DevCrypto(("/dev/crypto")):::interface
-        
-        Cryptodev["Cryptodev"]:::community
-        DMCrypt["dm-crypt"]:::community
-        
-        Core["CryptoAPI core"]:::community
-        
-        subgraph Drivers [crypto drivers]
-            hash["hash"]:::st_driver
-            cryp["cryp"]:::st_driver
-            crc32["crc32"]:::st_driver
-        end
-    end
-
-    subgraph HW_Layer [Hardware]
-        subgraph MPU [MPU device]
-            HASH_HW["HASH"]:::hardware
-            CRYP_HW["CRYP"]:::hardware
-            CRC_HW["CRC"]:::hardware
-        end
-    end
-
-    App --> OpenSSL
-    OpenSSL --> AF_ALG
-    OpenSSL --> DevCrypto
-    
-    AF_ALG --> Core
-    DevCrypto --> Cryptodev
-    Cryptodev --> Core
-    DMCrypt --> Core
-    
-    Core --> hash
-    Core --> cryp
-    Core --> crc32
-    
-    hash --> HASH_HW
-    cryp --> CRYP_HW
-    crc32 --> CRC_HW
-
-    style User_Space fill:none,stroke:#4472C4,stroke-dasharray: 5 5
-    style Kernel_Space fill:none,stroke:#4472C4,stroke-dasharray: 5 5
-    style HW_Layer fill:none,stroke:#4472C4,stroke-dasharray: 5 5
-    
-    linkStyle default stroke:#CC00CC,stroke-width:2px;
-```
+![Architecture Crypto](./images/drawio.svg)
 
 ## How to load the provider
 
