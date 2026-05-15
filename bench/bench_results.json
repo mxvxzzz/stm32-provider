@@ -1,0 +1,2334 @@
+[
+  {
+    "implementation": "openssl",
+    "timestamp": "2025-06-12T19:40:29Z",
+    "seconds_per_run": 5,
+    "blocks": [
+      {
+        "block_bytes": 16,
+        "sha1": {
+          "kbps": 6950.04,
+          "mbps": 6.95,
+          "cpu0": 99.61,
+          "cpu1": 2.19,
+          "cycles": 7527677530,
+          "instructions": 5229562563,
+          "context_switches": 15,
+          "page_faults": 376,
+          "branch_misses": 24500181
+        },
+        "sha256": {
+          "kbps": 5035.41,
+          "mbps": 5.04,
+          "cpu0": 99.41,
+          "cpu1": 2.19,
+          "cycles": 7528430122,
+          "instructions": 4954154066,
+          "context_switches": 6,
+          "page_faults": 376,
+          "branch_misses": 11945302
+        },
+        "sha512": {
+          "kbps": 4864.39,
+          "mbps": 4.86,
+          "cpu0": 99.41,
+          "cpu1": 2.39,
+          "cycles": 7528409947,
+          "instructions": 5866205284,
+          "context_switches": 7,
+          "page_faults": 376,
+          "branch_misses": 16626506
+        }
+      },
+      {
+        "block_bytes": 64,
+        "sha1": {
+          "kbps": 21507.2,
+          "mbps": 21.51,
+          "cpu0": 99.8,
+          "cpu1": 3.56,
+          "cycles": 7528512449,
+          "instructions": 5744090373,
+          "context_switches": 13,
+          "page_faults": 377,
+          "branch_misses": 18891811
+        },
+        "sha256": {
+          "kbps": 13935.56,
+          "mbps": 13.94,
+          "cpu0": 99.61,
+          "cpu1": 1.79,
+          "cycles": 7528088698,
+          "instructions": 5287956013,
+          "context_switches": 14,
+          "page_faults": 376,
+          "branch_misses": 8517922
+        },
+        "sha512": {
+          "kbps": 19459.99,
+          "mbps": 19.46,
+          "cpu0": 99.41,
+          "cpu1": 1.2,
+          "cycles": 7528845938,
+          "instructions": 5866701642,
+          "context_switches": 8,
+          "page_faults": 375,
+          "branch_misses": 17999447
+        }
+      },
+      {
+        "block_bytes": 128,
+        "sha1": {
+          "kbps": 35031.96,
+          "mbps": 35.03,
+          "cpu0": 99.41,
+          "cpu1": 1.98,
+          "cycles": 7528550593,
+          "instructions": 6052152239,
+          "context_switches": 11,
+          "page_faults": 377,
+          "branch_misses": 15492879
+        },
+        "sha256": {
+          "kbps": 21397.72,
+          "mbps": 21.4,
+          "cpu0": 99.22,
+          "cpu1": 1.58,
+          "cycles": 7523539742,
+          "instructions": 5473418157,
+          "context_switches": 10,
+          "page_faults": 376,
+          "branch_misses": 7755444
+        },
+        "sha512": {
+          "kbps": 26051.33,
+          "mbps": 26.05,
+          "cpu0": 99.41,
+          "cpu1": 2.39,
+          "cycles": 7527901810,
+          "instructions": 6363976711,
+          "context_switches": 9,
+          "page_faults": 377,
+          "branch_misses": 12185717
+        }
+      },
+      {
+        "block_bytes": 256,
+        "sha1": {
+          "kbps": 51086.23,
+          "mbps": 51.09,
+          "cpu0": 99.41,
+          "cpu1": 3.57,
+          "cycles": 7502480949,
+          "instructions": 6416698519,
+          "context_switches": 50,
+          "page_faults": 375,
+          "branch_misses": 12457888
+        },
+        "sha256": {
+          "kbps": 29359.77,
+          "mbps": 29.36,
+          "cpu0": 99.41,
+          "cpu1": 2.58,
+          "cycles": 7528552529,
+          "instructions": 5672912579,
+          "context_switches": 8,
+          "page_faults": 377,
+          "branch_misses": 5331516
+        },
+        "sha512": {
+          "kbps": 39183.72,
+          "mbps": 39.18,
+          "cpu0": 99.61,
+          "cpu1": 2.0,
+          "cycles": 7528200077,
+          "instructions": 6607382796,
+          "context_switches": 9,
+          "page_faults": 375,
+          "branch_misses": 10401129
+        }
+      },
+      {
+        "block_bytes": 512,
+        "sha1": {
+          "kbps": 66591.85,
+          "mbps": 66.59,
+          "cpu0": 99.41,
+          "cpu1": 1.98,
+          "cycles": 7528980809,
+          "instructions": 6792933097,
+          "context_switches": 12,
+          "page_faults": 375,
+          "branch_misses": 9798031
+        },
+        "sha256": {
+          "kbps": 36123.65,
+          "mbps": 36.12,
+          "cpu0": 99.41,
+          "cpu1": 1.39,
+          "cycles": 7527807388,
+          "instructions": 5858576416,
+          "context_switches": 10,
+          "page_faults": 374,
+          "branch_misses": 3472316
+        },
+        "sha512": {
+          "kbps": 52603.9,
+          "mbps": 52.6,
+          "cpu0": 99.61,
+          "cpu1": 1.79,
+          "cycles": 7528234443,
+          "instructions": 6880712760,
+          "context_switches": 9,
+          "page_faults": 376,
+          "branch_misses": 7571296
+        }
+      },
+      {
+        "block_bytes": 1024,
+        "sha1": {
+          "kbps": 78446.8,
+          "mbps": 78.45,
+          "cpu0": 99.21,
+          "cpu1": 2.17,
+          "cycles": 7523764992,
+          "instructions": 7077272809,
+          "context_switches": 13,
+          "page_faults": 375,
+          "branch_misses": 6052494
+        },
+        "sha256": {
+          "kbps": 40726.12,
+          "mbps": 40.73,
+          "cpu0": 99.41,
+          "cpu1": 2.58,
+          "cycles": 7528815999,
+          "instructions": 5973677520,
+          "context_switches": 10,
+          "page_faults": 377,
+          "branch_misses": 2242769
+        },
+        "sha512": {
+          "kbps": 63485.34,
+          "mbps": 63.49,
+          "cpu0": 99.41,
+          "cpu1": 2.19,
+          "cycles": 7528137444,
+          "instructions": 7102319716,
+          "context_switches": 9,
+          "page_faults": 376,
+          "branch_misses": 4809786
+        }
+      },
+      {
+        "block_bytes": 2048,
+        "sha1": {
+          "kbps": 86117.58,
+          "mbps": 86.12,
+          "cpu0": 99.41,
+          "cpu1": 2.57,
+          "cycles": 7524109651,
+          "instructions": 7261380491,
+          "context_switches": 12,
+          "page_faults": 377,
+          "branch_misses": 3543876
+        },
+        "sha256": {
+          "kbps": 43466.75,
+          "mbps": 43.47,
+          "cpu0": 99.41,
+          "cpu1": 3.78,
+          "cycles": 7523332286,
+          "instructions": 6038831279,
+          "context_switches": 22,
+          "page_faults": 376,
+          "branch_misses": 1492622
+        },
+        "sha512": {
+          "kbps": 70683.44,
+          "mbps": 70.68,
+          "cpu0": 99.61,
+          "cpu1": 2.39,
+          "cycles": 7528459725,
+          "instructions": 7239529000,
+          "context_switches": 11,
+          "page_faults": 376,
+          "branch_misses": 2952311
+        }
+      },
+      {
+        "block_bytes": 4096,
+        "sha1": {
+          "kbps": 90598.6,
+          "mbps": 90.6,
+          "cpu0": 99.41,
+          "cpu1": 1.2,
+          "cycles": 7528807735,
+          "instructions": 7372433167,
+          "context_switches": 12,
+          "page_faults": 377,
+          "branch_misses": 2151518
+        },
+        "sha256": {
+          "kbps": 45081.4,
+          "mbps": 45.08,
+          "cpu0": 99.41,
+          "cpu1": 1.78,
+          "cycles": 7528050408,
+          "instructions": 6087822004,
+          "context_switches": 11,
+          "page_faults": 378,
+          "branch_misses": 1059576
+        },
+        "sha512": {
+          "kbps": 75132.11,
+          "mbps": 75.13,
+          "cpu0": 99.8,
+          "cpu1": 1.59,
+          "cycles": 7528198453,
+          "instructions": 7340005798,
+          "context_switches": 9,
+          "page_faults": 377,
+          "branch_misses": 1849684
+        }
+      },
+      {
+        "block_bytes": 8192,
+        "sha1": {
+          "kbps": 92993.95,
+          "mbps": 92.99,
+          "cpu0": 99.61,
+          "cpu1": 1.8,
+          "cycles": 7528108428,
+          "instructions": 7430157530,
+          "context_switches": 12,
+          "page_faults": 379,
+          "branch_misses": 1387171
+        },
+        "sha256": {
+          "kbps": 45898.14,
+          "mbps": 45.9,
+          "cpu0": 99.61,
+          "cpu1": 2.39,
+          "cycles": 7528691044,
+          "instructions": 6108835269,
+          "context_switches": 11,
+          "page_faults": 380,
+          "branch_misses": 812065
+        },
+        "sha512": {
+          "kbps": 77430.78,
+          "mbps": 77.43,
+          "cpu0": 99.41,
+          "cpu1": 2.19,
+          "cycles": 7524212243,
+          "instructions": 7380938096,
+          "context_switches": 7,
+          "page_faults": 379,
+          "branch_misses": 1213311
+        }
+      },
+      {
+        "block_bytes": 16384,
+        "sha1": {
+          "kbps": 94217.83,
+          "mbps": 94.22,
+          "cpu0": 99.61,
+          "cpu1": 2.58,
+          "cycles": 7528712727,
+          "instructions": 7458374146,
+          "context_switches": 12,
+          "page_faults": 384,
+          "branch_misses": 965411
+        },
+        "sha256": {
+          "kbps": 46311.01,
+          "mbps": 46.31,
+          "cpu0": 99.61,
+          "cpu1": 2.77,
+          "cycles": 7529223934,
+          "instructions": 6118928387,
+          "context_switches": 10,
+          "page_faults": 383,
+          "branch_misses": 695701
+        },
+        "sha512": {
+          "kbps": 78682.52,
+          "mbps": 78.68,
+          "cpu0": 99.41,
+          "cpu1": 1.39,
+          "cycles": 7529270216,
+          "instructions": 7407701964,
+          "context_switches": 12,
+          "page_faults": 384,
+          "branch_misses": 920156
+        }
+      },
+      {
+        "block_bytes": 32768,
+        "sha1": {
+          "kbps": 94647.09,
+          "mbps": 94.65,
+          "cpu0": 99.22,
+          "cpu1": 1.58,
+          "cycles": 7524244915,
+          "instructions": 7457931076,
+          "context_switches": 15,
+          "page_faults": 392,
+          "branch_misses": 800890
+        },
+        "sha256": {
+          "kbps": 46491.24,
+          "mbps": 46.49,
+          "cpu0": 99.41,
+          "cpu1": 1.79,
+          "cycles": 7528898117,
+          "instructions": 6120382217,
+          "context_switches": 11,
+          "page_faults": 392,
+          "branch_misses": 643584
+        },
+        "sha512": {
+          "kbps": 79278.9,
+          "mbps": 79.28,
+          "cpu0": 99.41,
+          "cpu1": 1.59,
+          "cycles": 7528479446,
+          "instructions": 7416598351,
+          "context_switches": 9,
+          "page_faults": 391,
+          "branch_misses": 734261
+        }
+      },
+      {
+        "block_bytes": 65536,
+        "sha1": {
+          "kbps": 95014.09,
+          "mbps": 95.01,
+          "cpu0": 99.41,
+          "cpu1": 2.59,
+          "cycles": 7528287604,
+          "instructions": 7469942689,
+          "context_switches": 12,
+          "page_faults": 407,
+          "branch_misses": 717249
+        },
+        "sha256": {
+          "kbps": 46622.31,
+          "mbps": 46.62,
+          "cpu0": 99.8,
+          "cpu1": 1.6,
+          "cycles": 7529797612,
+          "instructions": 6126276910,
+          "context_switches": 9,
+          "page_faults": 406,
+          "branch_misses": 612082
+        },
+        "sha512": {
+          "kbps": 79626.24,
+          "mbps": 79.63,
+          "cpu0": 99.21,
+          "cpu1": 2.58,
+          "cycles": 7529708054,
+          "instructions": 7425722536,
+          "context_switches": 11,
+          "page_faults": 407,
+          "branch_misses": 661447
+        }
+      },
+      {
+        "block_bytes": 131072,
+        "sha1": {
+          "kbps": 95263.13,
+          "mbps": 95.26,
+          "cpu0": 99.61,
+          "cpu1": 2.39,
+          "cycles": 7529487857,
+          "instructions": 7480098216,
+          "context_switches": 14,
+          "page_faults": 440,
+          "branch_misses": 624521
+        },
+        "sha256": {
+          "kbps": 46687.85,
+          "mbps": 46.69,
+          "cpu0": 99.61,
+          "cpu1": 1.98,
+          "cycles": 7533703252,
+          "instructions": 6129709417,
+          "context_switches": 10,
+          "page_faults": 442,
+          "branch_misses": 608999
+        },
+        "sha512": {
+          "kbps": 79744.2,
+          "mbps": 79.74,
+          "cpu0": 99.41,
+          "cpu1": 2.78,
+          "cycles": 7529496179,
+          "instructions": 7425606486,
+          "context_switches": 15,
+          "page_faults": 441,
+          "branch_misses": 636432
+        }
+      },
+      {
+        "block_bytes": 262144,
+        "sha1": {
+          "kbps": 95236.92,
+          "mbps": 95.24,
+          "cpu0": 99.6,
+          "cpu1": 2.3,
+          "cycles": 15026419212,
+          "instructions": 14934679227,
+          "context_switches": 20,
+          "page_faults": 505,
+          "branch_misses": 925808
+        },
+        "sha256": {
+          "kbps": 46687.85,
+          "mbps": 46.69,
+          "cpu0": 99.7,
+          "cpu1": 2.1,
+          "cycles": 15031529301,
+          "instructions": 12239945483,
+          "context_switches": 13,
+          "page_faults": 504,
+          "branch_misses": 820580
+        },
+        "sha512": {
+          "kbps": 79822.85,
+          "mbps": 79.82,
+          "cpu0": 99.6,
+          "cpu1": 2.69,
+          "cycles": 15028721731,
+          "instructions": 14840796138,
+          "context_switches": 13,
+          "page_faults": 505,
+          "branch_misses": 932359
+        }
+      },
+      {
+        "block_bytes": 524288,
+        "sha1": {
+          "kbps": 94972.62,
+          "mbps": 94.97,
+          "cpu0": 99.74,
+          "cpu1": 2.21,
+          "cycles": 22533379258,
+          "instructions": 22342024085,
+          "context_switches": 29,
+          "page_faults": 634,
+          "branch_misses": 1138080
+        },
+        "sha256": {
+          "kbps": 46595.62,
+          "mbps": 46.6,
+          "cpu0": 99.8,
+          "cpu1": 2.41,
+          "cycles": 22530675908,
+          "instructions": 18326523330,
+          "context_switches": 57,
+          "page_faults": 634,
+          "branch_misses": 1076555
+        },
+        "sha512": {
+          "kbps": 79691.78,
+          "mbps": 79.69,
+          "cpu0": 99.93,
+          "cpu1": 2.15,
+          "cycles": 22534613536,
+          "instructions": 22208555202,
+          "context_switches": 22,
+          "page_faults": 632,
+          "branch_misses": 1089451
+        }
+      },
+      {
+        "block_bytes": 1048576,
+        "sha1": {
+          "kbps": 94948.56,
+          "mbps": 94.95,
+          "cpu0": 99.85,
+          "cpu1": 1.97,
+          "cycles": 30031714142,
+          "instructions": 29754342693,
+          "context_switches": 33,
+          "page_faults": 889,
+          "branch_misses": 1311470
+        },
+        "sha256": {
+          "kbps": 46585.91,
+          "mbps": 46.59,
+          "cpu0": 99.85,
+          "cpu1": 2.42,
+          "cycles": 30035030255,
+          "instructions": 24419763332,
+          "context_switches": 33,
+          "page_faults": 891,
+          "branch_misses": 1268057
+        },
+        "sha512": {
+          "kbps": 79599.55,
+          "mbps": 79.6,
+          "cpu0": 99.85,
+          "cpu1": 2.22,
+          "cycles": 30047929601,
+          "instructions": 29582637424,
+          "context_switches": 28,
+          "page_faults": 889,
+          "branch_misses": 1264346
+        }
+      }
+    ]
+  },
+  {
+    "implementation": "st_afalg",
+    "timestamp": "2025-06-12T19:47:03Z",
+    "seconds_per_run": 5,
+    "blocks": [
+      {
+        "block_bytes": 16,
+        "sha1": {
+          "kbps": 145.56,
+          "mbps": 0.15,
+          "cpu0": 98.61,
+          "cpu1": 18.59,
+          "cycles": 4500263081,
+          "instructions": 1463020468,
+          "context_switches": 45530,
+          "page_faults": 381,
+          "branch_misses": 52379240
+        },
+        "sha256": {
+          "kbps": 144.52,
+          "mbps": 0.14,
+          "cpu0": 98.41,
+          "cpu1": 18.8,
+          "cycles": 4500627874,
+          "instructions": 1454887063,
+          "context_switches": 45204,
+          "page_faults": 381,
+          "branch_misses": 52787045
+        },
+        "sha512": {
+          "kbps": 138.0,
+          "mbps": 0.14,
+          "cpu0": 98.88,
+          "cpu1": 16.16,
+          "cycles": 4278622068,
+          "instructions": 1391209055,
+          "context_switches": 43160,
+          "page_faults": 380,
+          "branch_misses": 50179460
+        }
+      },
+      {
+        "block_bytes": 64,
+        "sha1": {
+          "kbps": 485.82,
+          "mbps": 0.49,
+          "cpu0": 86.62,
+          "cpu1": 26.13,
+          "cycles": 3819575072,
+          "instructions": 1216395316,
+          "context_switches": 37973,
+          "page_faults": 380,
+          "branch_misses": 44687962
+        },
+        "sha256": {
+          "kbps": 478.9,
+          "mbps": 0.48,
+          "cpu0": 86.84,
+          "cpu1": 28.6,
+          "cycles": 3805046688,
+          "instructions": 1202391041,
+          "context_switches": 37430,
+          "page_faults": 381,
+          "branch_misses": 44642750
+        },
+        "sha512": {
+          "kbps": 452.51,
+          "mbps": 0.45,
+          "cpu0": 85.91,
+          "cpu1": 26.99,
+          "cycles": 3575271944,
+          "instructions": 1136618675,
+          "context_switches": 35360,
+          "page_faults": 381,
+          "branch_misses": 42166378
+        }
+      },
+      {
+        "block_bytes": 128,
+        "sha1": {
+          "kbps": 976.87,
+          "mbps": 0.98,
+          "cpu0": 86.08,
+          "cpu1": 26.28,
+          "cycles": 3820759225,
+          "instructions": 1225803977,
+          "context_switches": 38178,
+          "page_faults": 382,
+          "branch_misses": 45005574
+        },
+        "sha256": {
+          "kbps": 965.5,
+          "mbps": 0.97,
+          "cpu0": 86.79,
+          "cpu1": 26.39,
+          "cycles": 3829870206,
+          "instructions": 1213601607,
+          "context_switches": 37726,
+          "page_faults": 381,
+          "branch_misses": 44989152
+        },
+        "sha512": {
+          "kbps": 920.24,
+          "mbps": 0.92,
+          "cpu0": 86.34,
+          "cpu1": 26.04,
+          "cycles": 3657116549,
+          "instructions": 1154386665,
+          "context_switches": 35954,
+          "page_faults": 380,
+          "branch_misses": 42778430
+        }
+      },
+      {
+        "block_bytes": 256,
+        "sha1": {
+          "kbps": 1899.93,
+          "mbps": 1.9,
+          "cpu0": 85.68,
+          "cpu1": 27.17,
+          "cycles": 3815930257,
+          "instructions": 1195518766,
+          "context_switches": 37119,
+          "page_faults": 381,
+          "branch_misses": 43805921
+        },
+        "sha256": {
+          "kbps": 1931.21,
+          "mbps": 1.93,
+          "cpu0": 86.28,
+          "cpu1": 26.79,
+          "cycles": 3805007797,
+          "instructions": 1214839480,
+          "context_switches": 37735,
+          "page_faults": 382,
+          "branch_misses": 44991628
+        },
+        "sha512": {
+          "kbps": 1844.99,
+          "mbps": 1.84,
+          "cpu0": 86.44,
+          "cpu1": 24.83,
+          "cycles": 3639332332,
+          "instructions": 1160571249,
+          "context_switches": 36045,
+          "page_faults": 380,
+          "branch_misses": 42817364
+        }
+      },
+      {
+        "block_bytes": 512,
+        "sha1": {
+          "kbps": 3580.11,
+          "mbps": 3.58,
+          "cpu0": 83.03,
+          "cpu1": 26.52,
+          "cycles": 3682258551,
+          "instructions": 1154270721,
+          "context_switches": 34972,
+          "page_faults": 382,
+          "branch_misses": 41899337
+        },
+        "sha256": {
+          "kbps": 3645.64,
+          "mbps": 3.65,
+          "cpu0": 83.6,
+          "cpu1": 27.38,
+          "cycles": 3678987218,
+          "instructions": 1170705429,
+          "context_switches": 35623,
+          "page_faults": 382,
+          "branch_misses": 43040938
+        },
+        "sha512": {
+          "kbps": 3488.26,
+          "mbps": 3.49,
+          "cpu0": 83.89,
+          "cpu1": 26.21,
+          "cycles": 3532143957,
+          "instructions": 1120430004,
+          "context_switches": 34071,
+          "page_faults": 382,
+          "branch_misses": 41033862
+        }
+      },
+      {
+        "block_bytes": 1024,
+        "sha1": {
+          "kbps": 7219.0,
+          "mbps": 7.22,
+          "cpu0": 80.87,
+          "cpu1": 25.66,
+          "cycles": 3626730349,
+          "instructions": 1154895679,
+          "context_switches": 35263,
+          "page_faults": 382,
+          "branch_misses": 41886838
+        },
+        "sha256": {
+          "kbps": 7300.3,
+          "mbps": 7.3,
+          "cpu0": 81.88,
+          "cpu1": 25.98,
+          "cycles": 3628780007,
+          "instructions": 1163457508,
+          "context_switches": 35661,
+          "page_faults": 382,
+          "branch_misses": 42771177
+        },
+        "sha512": {
+          "kbps": 7020.95,
+          "mbps": 7.02,
+          "cpu0": 83.26,
+          "cpu1": 24.0,
+          "cycles": 3506260310,
+          "instructions": 1118451306,
+          "context_switches": 34295,
+          "page_faults": 384,
+          "branch_misses": 40936965
+        }
+      },
+      {
+        "block_bytes": 2048,
+        "sha1": {
+          "kbps": 13163.32,
+          "mbps": 13.16,
+          "cpu0": 75.4,
+          "cpu1": 23.45,
+          "cycles": 3379986530,
+          "instructions": 1078212368,
+          "context_switches": 32153,
+          "page_faults": 383,
+          "branch_misses": 38720783
+        },
+        "sha256": {
+          "kbps": 13343.54,
+          "mbps": 13.34,
+          "cpu0": 77.38,
+          "cpu1": 22.12,
+          "cycles": 3452844267,
+          "instructions": 1095985023,
+          "context_switches": 32598,
+          "page_faults": 381,
+          "branch_misses": 39767965
+        },
+        "sha512": {
+          "kbps": 12876.6,
+          "mbps": 12.88,
+          "cpu0": 78.41,
+          "cpu1": 23.01,
+          "cycles": 3362151269,
+          "instructions": 1057993844,
+          "context_switches": 31453,
+          "page_faults": 383,
+          "branch_misses": 38244845
+        }
+      },
+      {
+        "block_bytes": 4096,
+        "sha1": {
+          "kbps": 20202.29,
+          "mbps": 20.2,
+          "cpu0": 65.8,
+          "cpu1": 27.02,
+          "cycles": 2734469562,
+          "instructions": 873691458,
+          "context_switches": 24835,
+          "page_faults": 384,
+          "branch_misses": 30427792
+        },
+        "sha256": {
+          "kbps": 22627.94,
+          "mbps": 22.63,
+          "cpu0": 67.48,
+          "cpu1": 22.44,
+          "cycles": 3069175631,
+          "instructions": 978186602,
+          "context_switches": 27626,
+          "page_faults": 383,
+          "branch_misses": 34243050
+        },
+        "sha512": {
+          "kbps": 21571.99,
+          "mbps": 21.57,
+          "cpu0": 69.23,
+          "cpu1": 24.46,
+          "cycles": 2952545628,
+          "instructions": 932092386,
+          "context_switches": 26368,
+          "page_faults": 384,
+          "branch_misses": 32592323
+        }
+      },
+      {
+        "block_bytes": 8192,
+        "sha1": {
+          "kbps": 30659.38,
+          "mbps": 30.66,
+          "cpu0": 53.93,
+          "cpu1": 27.57,
+          "cycles": 2263235292,
+          "instructions": 719866801,
+          "context_switches": 18905,
+          "page_faults": 386,
+          "branch_misses": 23418315
+        },
+        "sha256": {
+          "kbps": 32274.84,
+          "mbps": 32.27,
+          "cpu0": 58.46,
+          "cpu1": 25.9,
+          "cycles": 2355407879,
+          "instructions": 758244969,
+          "context_switches": 19885,
+          "page_faults": 385,
+          "branch_misses": 24847324
+        },
+        "sha512": {
+          "kbps": 31517.9,
+          "mbps": 31.52,
+          "cpu0": 59.57,
+          "cpu1": 27.04,
+          "cycles": 2341532901,
+          "instructions": 739531731,
+          "context_switches": 19442,
+          "page_faults": 386,
+          "branch_misses": 24193835
+        }
+      },
+      {
+        "block_bytes": 16384,
+        "sha1": {
+          "kbps": 44312.17,
+          "mbps": 44.31,
+          "cpu0": 45.38,
+          "cpu1": 22.59,
+          "cycles": 1799614646,
+          "instructions": 603524549,
+          "context_switches": 13657,
+          "page_faults": 388,
+          "branch_misses": 17140040
+        },
+        "sha256": {
+          "kbps": 46661.63,
+          "mbps": 46.66,
+          "cpu0": 48.35,
+          "cpu1": 24.58,
+          "cycles": 1928704000,
+          "instructions": 636434272,
+          "context_switches": 14391,
+          "page_faults": 389,
+          "branch_misses": 18249904
+        },
+        "sha512": {
+          "kbps": 46537.11,
+          "mbps": 46.54,
+          "cpu0": 49.26,
+          "cpu1": 24.74,
+          "cycles": 1948926828,
+          "instructions": 634529760,
+          "context_switches": 14358,
+          "page_faults": 391,
+          "branch_misses": 18087839
+        }
+      },
+      {
+        "block_bytes": 32768,
+        "sha1": {
+          "kbps": 55476.22,
+          "mbps": 55.48,
+          "cpu0": 35.09,
+          "cpu1": 21.89,
+          "cycles": 1420366129,
+          "instructions": 485756029,
+          "context_switches": 8549,
+          "page_faults": 400,
+          "branch_misses": 11044225
+        },
+        "sha256": {
+          "kbps": 60260.35,
+          "mbps": 60.26,
+          "cpu0": 37.63,
+          "cpu1": 22.09,
+          "cycles": 1544236026,
+          "instructions": 526906489,
+          "context_switches": 9336,
+          "page_faults": 396,
+          "branch_misses": 12093095
+        },
+        "sha512": {
+          "kbps": 61662.82,
+          "mbps": 61.66,
+          "cpu0": 36.6,
+          "cpu1": 23.59,
+          "cycles": 1540760270,
+          "instructions": 538132138,
+          "context_switches": 9488,
+          "page_faults": 398,
+          "branch_misses": 12249122
+        }
+      },
+      {
+        "block_bytes": 65536,
+        "sha1": {
+          "kbps": 60266.91,
+          "mbps": 60.27,
+          "cpu0": 31.91,
+          "cpu1": 22.6,
+          "cycles": 1207568245,
+          "instructions": 403074510,
+          "context_switches": 10055,
+          "page_faults": 413,
+          "branch_misses": 7506399
+        },
+        "sha256": {
+          "kbps": 66307.78,
+          "mbps": 66.31,
+          "cpu0": 33.26,
+          "cpu1": 20.82,
+          "cycles": 1331867548,
+          "instructions": 442349529,
+          "context_switches": 11015,
+          "page_faults": 412,
+          "branch_misses": 8229027
+        },
+        "sha512": {
+          "kbps": 66925.36,
+          "mbps": 66.93,
+          "cpu0": 33.26,
+          "cpu1": 23.59,
+          "cycles": 1363391121,
+          "instructions": 445341208,
+          "context_switches": 11080,
+          "page_faults": 413,
+          "branch_misses": 8267082
+        }
+      },
+      {
+        "block_bytes": 131072,
+        "sha1": {
+          "kbps": 62993.2,
+          "mbps": 62.99,
+          "cpu0": 29.07,
+          "cpu1": 20.73,
+          "cycles": 1172916064,
+          "instructions": 350290743,
+          "context_switches": 7820,
+          "page_faults": 480,
+          "branch_misses": 5156323
+        },
+        "sha256": {
+          "kbps": 70044.88,
+          "mbps": 70.04,
+          "cpu0": 28.22,
+          "cpu1": 23.54,
+          "cycles": 1247934413,
+          "instructions": 383537811,
+          "context_switches": 8532,
+          "page_faults": 480,
+          "branch_misses": 5452245
+        },
+        "sha512": {
+          "kbps": 71434.24,
+          "mbps": 71.43,
+          "cpu0": 31.06,
+          "cpu1": 22.18,
+          "cycles": 1247564894,
+          "instructions": 390231883,
+          "context_switches": 8672,
+          "page_faults": 479,
+          "branch_misses": 5487622
+        }
+      },
+      {
+        "block_bytes": 262144,
+        "sha1": {
+          "kbps": 63963.14,
+          "mbps": 63.96,
+          "cpu0": 22.28,
+          "cpu1": 20.37,
+          "cycles": 2099746478,
+          "instructions": 618262638,
+          "context_switches": 12866,
+          "page_faults": 605,
+          "branch_misses": 6903189
+        },
+        "sha256": {
+          "kbps": 70883.74,
+          "mbps": 70.88,
+          "cpu0": 27.18,
+          "cpu1": 22.7,
+          "cycles": 2308786042,
+          "instructions": 683166100,
+          "context_switches": 14613,
+          "page_faults": 604,
+          "branch_misses": 7553768
+        },
+        "sha512": {
+          "kbps": 73091.3,
+          "mbps": 73.09,
+          "cpu0": 28.23,
+          "cpu1": 21.49,
+          "cycles": 2357757585,
+          "instructions": 704073931,
+          "context_switches": 15254,
+          "page_faults": 606,
+          "branch_misses": 7744057
+        }
+      },
+      {
+        "block_bytes": 524288,
+        "sha1": {
+          "kbps": 66295.71,
+          "mbps": 66.3,
+          "cpu0": 22.39,
+          "cpu1": 19.41,
+          "cycles": 2779497167,
+          "instructions": 896679885,
+          "context_switches": 19071,
+          "page_faults": 861,
+          "branch_misses": 8132490
+        },
+        "sha256": {
+          "kbps": 73749.85,
+          "mbps": 73.75,
+          "cpu0": 25.76,
+          "cpu1": 20.67,
+          "cycles": 3133341652,
+          "instructions": 997404541,
+          "context_switches": 22589,
+          "page_faults": 860,
+          "branch_misses": 9058756
+        },
+        "sha512": {
+          "kbps": 76320.41,
+          "mbps": 76.32,
+          "cpu0": 27.29,
+          "cpu1": 21.55,
+          "cycles": 3274769043,
+          "instructions": 1036762902,
+          "context_switches": 24575,
+          "page_faults": 862,
+          "branch_misses": 9659830
+        }
+      },
+      {
+        "block_bytes": 1048576,
+        "sha1": {
+          "kbps": 68961.82,
+          "mbps": 68.96,
+          "cpu0": 20.53,
+          "cpu1": 19.49,
+          "cycles": 3293746233,
+          "instructions": 1200096579,
+          "context_switches": 25841,
+          "page_faults": 1372,
+          "branch_misses": 9470660
+        },
+        "sha256": {
+          "kbps": 75969.33,
+          "mbps": 75.97,
+          "cpu0": 22.52,
+          "cpu1": 21.1,
+          "cycles": 3578002010,
+          "instructions": 1317363306,
+          "context_switches": 28502,
+          "page_faults": 1372,
+          "branch_misses": 10274339
+        },
+        "sha512": {
+          "kbps": 78643.2,
+          "mbps": 78.64,
+          "cpu0": 22.8,
+          "cpu1": 21.99,
+          "cycles": 3725457827,
+          "instructions": 1356292899,
+          "context_switches": 29014,
+          "page_faults": 1373,
+          "branch_misses": 10164878
+        }
+      }
+    ]
+  },
+  {
+    "implementation": "st_cryptodev",
+    "timestamp": "2025-06-12T19:53:37Z",
+    "seconds_per_run": 5,
+    "blocks": [
+      {
+        "block_bytes": 16,
+        "sha1": {
+          "kbps": 160.93,
+          "mbps": 0.16,
+          "cpu0": 99.3,
+          "cpu1": 16.41,
+          "cycles": 4468207521,
+          "instructions": 1629255369,
+          "context_switches": 50311,
+          "page_faults": 382,
+          "branch_misses": 54209515
+        },
+        "sha256": {
+          "kbps": 159.85,
+          "mbps": 0.16,
+          "cpu0": 99.05,
+          "cpu1": 17.1,
+          "cycles": 4449131073,
+          "instructions": 1635313104,
+          "context_switches": 49968,
+          "page_faults": 382,
+          "branch_misses": 54604774
+        },
+        "sha512": {
+          "kbps": 150.78,
+          "mbps": 0.15,
+          "cpu0": 99.31,
+          "cpu1": 15.43,
+          "cycles": 4206245914,
+          "instructions": 1538899444,
+          "context_switches": 47129,
+          "page_faults": 383,
+          "branch_misses": 51324277
+        }
+      },
+      {
+        "block_bytes": 64,
+        "sha1": {
+          "kbps": 518.2,
+          "mbps": 0.52,
+          "cpu0": 85.85,
+          "cpu1": 28.31,
+          "cycles": 3691853967,
+          "instructions": 1308630704,
+          "context_switches": 40487,
+          "page_faults": 382,
+          "branch_misses": 44547008
+        },
+        "sha256": {
+          "kbps": 518.53,
+          "mbps": 0.52,
+          "cpu0": 86.11,
+          "cpu1": 27.11,
+          "cycles": 3665547163,
+          "instructions": 1295722703,
+          "context_switches": 40518,
+          "page_faults": 383,
+          "branch_misses": 44214457
+        },
+        "sha512": {
+          "kbps": 487.46,
+          "mbps": 0.49,
+          "cpu0": 86.38,
+          "cpu1": 27.27,
+          "cycles": 3546382663,
+          "instructions": 1240232319,
+          "context_switches": 38087,
+          "page_faults": 383,
+          "branch_misses": 42397576
+        }
+      },
+      {
+        "block_bytes": 128,
+        "sha1": {
+          "kbps": 685.08,
+          "mbps": 0.69,
+          "cpu0": 75.06,
+          "cpu1": 36.9,
+          "cycles": 2913190628,
+          "instructions": 970572284,
+          "context_switches": 53525,
+          "page_faults": 382,
+          "branch_misses": 35248201
+        },
+        "sha256": {
+          "kbps": 696.73,
+          "mbps": 0.7,
+          "cpu0": 73.09,
+          "cpu1": 37.74,
+          "cycles": 2825959589,
+          "instructions": 953185082,
+          "context_switches": 54430,
+          "page_faults": 382,
+          "branch_misses": 34273793
+        },
+        "sha512": {
+          "kbps": 983.35,
+          "mbps": 0.98,
+          "cpu0": 85.81,
+          "cpu1": 26.26,
+          "cycles": 3456550040,
+          "instructions": 1201065208,
+          "context_switches": 38419,
+          "page_faults": 382,
+          "branch_misses": 40512990
+        }
+      },
+      {
+        "block_bytes": 256,
+        "sha1": {
+          "kbps": 1381.17,
+          "mbps": 1.38,
+          "cpu0": 74.94,
+          "cpu1": 38.44,
+          "cycles": 2829868188,
+          "instructions": 946854545,
+          "context_switches": 54065,
+          "page_faults": 381,
+          "branch_misses": 34119992
+        },
+        "sha256": {
+          "kbps": 1383.88,
+          "mbps": 1.38,
+          "cpu0": 74.54,
+          "cpu1": 38.07,
+          "cycles": 2837355504,
+          "instructions": 948696548,
+          "context_switches": 54056,
+          "page_faults": 381,
+          "branch_misses": 34130344
+        },
+        "sha512": {
+          "kbps": 1291.72,
+          "mbps": 1.29,
+          "cpu0": 71.9,
+          "cpu1": 40.32,
+          "cycles": 2644519515,
+          "instructions": 887720663,
+          "context_switches": 50457,
+          "page_faults": 382,
+          "branch_misses": 31894993
+        }
+      },
+      {
+        "block_bytes": 512,
+        "sha1": {
+          "kbps": 2731.11,
+          "mbps": 2.73,
+          "cpu0": 73.44,
+          "cpu1": 38.72,
+          "cycles": 2815629890,
+          "instructions": 934155780,
+          "context_switches": 53344,
+          "page_faults": 381,
+          "branch_misses": 33631560
+        },
+        "sha256": {
+          "kbps": 2729.88,
+          "mbps": 2.73,
+          "cpu0": 73.06,
+          "cpu1": 37.07,
+          "cycles": 2807456910,
+          "instructions": 934407789,
+          "context_switches": 53317,
+          "page_faults": 382,
+          "branch_misses": 33609807
+        },
+        "sha512": {
+          "kbps": 2568.19,
+          "mbps": 2.57,
+          "cpu0": 71.19,
+          "cpu1": 38.73,
+          "cycles": 2614708755,
+          "instructions": 882332390,
+          "context_switches": 50162,
+          "page_faults": 381,
+          "branch_misses": 31721314
+        }
+      },
+      {
+        "block_bytes": 1024,
+        "sha1": {
+          "kbps": 5305.75,
+          "mbps": 5.31,
+          "cpu0": 71.66,
+          "cpu1": 37.79,
+          "cycles": 2741901491,
+          "instructions": 907684923,
+          "context_switches": 51814,
+          "page_faults": 383,
+          "branch_misses": 32673100
+        },
+        "sha256": {
+          "kbps": 5318.04,
+          "mbps": 5.32,
+          "cpu0": 70.57,
+          "cpu1": 38.05,
+          "cycles": 2715234617,
+          "instructions": 909556880,
+          "context_switches": 51950,
+          "page_faults": 382,
+          "branch_misses": 32680151
+        },
+        "sha512": {
+          "kbps": 4613.53,
+          "mbps": 4.61,
+          "cpu0": 67.92,
+          "cpu1": 40.09,
+          "cycles": 2364966578,
+          "instructions": 792730797,
+          "context_switches": 45189,
+          "page_faults": 381,
+          "branch_misses": 28373463
+        }
+      },
+      {
+        "block_bytes": 2048,
+        "sha1": {
+          "kbps": 8938.7,
+          "mbps": 8.94,
+          "cpu0": 65.73,
+          "cpu1": 39.73,
+          "cycles": 2289918552,
+          "instructions": 767515753,
+          "context_switches": 43980,
+          "page_faults": 382,
+          "branch_misses": 27488873
+        },
+        "sha256": {
+          "kbps": 9046.84,
+          "mbps": 9.05,
+          "cpu0": 66.51,
+          "cpu1": 38.58,
+          "cycles": 2354153779,
+          "instructions": 778095555,
+          "context_switches": 44511,
+          "page_faults": 381,
+          "branch_misses": 27875885
+        },
+        "sha512": {
+          "kbps": 8557.77,
+          "mbps": 8.56,
+          "cpu0": 66.13,
+          "cpu1": 40.18,
+          "cycles": 2219148241,
+          "instructions": 738015008,
+          "context_switches": 42120,
+          "page_faults": 382,
+          "branch_misses": 26400829
+        }
+      },
+      {
+        "block_bytes": 4096,
+        "sha1": {
+          "kbps": 15928.62,
+          "mbps": 15.93,
+          "cpu0": 60.41,
+          "cpu1": 37.75,
+          "cycles": 2081805840,
+          "instructions": 694949342,
+          "context_switches": 39333,
+          "page_faults": 382,
+          "branch_misses": 25231938
+        },
+        "sha256": {
+          "kbps": 16346.32,
+          "mbps": 16.35,
+          "cpu0": 61.8,
+          "cpu1": 36.22,
+          "cycles": 2117363289,
+          "instructions": 712760684,
+          "context_switches": 40311,
+          "page_faults": 383,
+          "branch_misses": 25748387
+        },
+        "sha512": {
+          "kbps": 15480.59,
+          "mbps": 15.48,
+          "cpu0": 62.81,
+          "cpu1": 37.05,
+          "cycles": 2106762538,
+          "instructions": 696807721,
+          "context_switches": 38308,
+          "page_faults": 383,
+          "branch_misses": 25495267
+        }
+      },
+      {
+        "block_bytes": 8192,
+        "sha1": {
+          "kbps": 26370.05,
+          "mbps": 26.37,
+          "cpu0": 50.68,
+          "cpu1": 32.15,
+          "cycles": 1824502758,
+          "instructions": 600880386,
+          "context_switches": 32640,
+          "page_faults": 387,
+          "branch_misses": 22044038
+        },
+        "sha256": {
+          "kbps": 27074.56,
+          "mbps": 27.07,
+          "cpu0": 54.7,
+          "cpu1": 34.42,
+          "cycles": 1905504113,
+          "instructions": 628602591,
+          "context_switches": 33529,
+          "page_faults": 384,
+          "branch_misses": 23077513
+        },
+        "sha512": {
+          "kbps": 26265.19,
+          "mbps": 26.27,
+          "cpu0": 53.51,
+          "cpu1": 35.37,
+          "cycles": 1856711588,
+          "instructions": 598297712,
+          "context_switches": 32505,
+          "page_faults": 384,
+          "branch_misses": 21926383
+        }
+      },
+      {
+        "block_bytes": 16384,
+        "sha1": {
+          "kbps": 39744.31,
+          "mbps": 39.74,
+          "cpu0": 41.33,
+          "cpu1": 29.54,
+          "cycles": 1490984081,
+          "instructions": 469544785,
+          "context_switches": 24733,
+          "page_faults": 389,
+          "branch_misses": 16775491
+        },
+        "sha256": {
+          "kbps": 42850.71,
+          "mbps": 42.85,
+          "cpu0": 44.3,
+          "cpu1": 30.75,
+          "cycles": 1541795492,
+          "instructions": 492386960,
+          "context_switches": 26599,
+          "page_faults": 390,
+          "branch_misses": 17415240
+        },
+        "sha512": {
+          "kbps": 42388.68,
+          "mbps": 42.39,
+          "cpu0": 45.69,
+          "cpu1": 30.8,
+          "cycles": 1506478357,
+          "instructions": 487234194,
+          "context_switches": 26348,
+          "page_faults": 388,
+          "branch_misses": 17194563
+        }
+      },
+      {
+        "block_bytes": 32768,
+        "sha1": {
+          "kbps": 55050.24,
+          "mbps": 55.05,
+          "cpu0": 31.01,
+          "cpu1": 23.75,
+          "cycles": 1079415284,
+          "instructions": 336545855,
+          "context_switches": 17402,
+          "page_faults": 398,
+          "branch_misses": 11388621
+        },
+        "sha256": {
+          "kbps": 59329.74,
+          "mbps": 59.33,
+          "cpu0": 34.98,
+          "cpu1": 25.52,
+          "cycles": 1177221341,
+          "instructions": 366110187,
+          "context_switches": 18595,
+          "page_faults": 396,
+          "branch_misses": 12405052
+        },
+        "sha512": {
+          "kbps": 59454.26,
+          "mbps": 59.45,
+          "cpu0": 35.58,
+          "cpu1": 26.05,
+          "cycles": 1223811958,
+          "instructions": 377510636,
+          "context_switches": 18627,
+          "page_faults": 397,
+          "branch_misses": 12901335
+        }
+      },
+      {
+        "block_bytes": 65536,
+        "sha1": {
+          "kbps": 66519.04,
+          "mbps": 66.52,
+          "cpu0": 26.36,
+          "cpu1": 22.24,
+          "cycles": 813134207,
+          "instructions": 235423644,
+          "context_switches": 10747,
+          "page_faults": 414,
+          "branch_misses": 7450706
+        },
+        "sha256": {
+          "kbps": 73531.39,
+          "mbps": 73.53,
+          "cpu0": 26.03,
+          "cpu1": 21.88,
+          "cycles": 875445009,
+          "instructions": 257615483,
+          "context_switches": 11881,
+          "page_faults": 413,
+          "branch_misses": 8102033
+        },
+        "sha512": {
+          "kbps": 75445.04,
+          "mbps": 75.45,
+          "cpu0": 25.94,
+          "cpu1": 22.9,
+          "cycles": 885670864,
+          "instructions": 260151697,
+          "context_switches": 12062,
+          "page_faults": 413,
+          "branch_misses": 8148964
+        }
+      },
+      {
+        "block_bytes": 131072,
+        "sha1": {
+          "kbps": 71643.96,
+          "mbps": 71.64,
+          "cpu0": 19.6,
+          "cpu1": 20.69,
+          "cycles": 670567160,
+          "instructions": 160997873,
+          "context_switches": 5684,
+          "page_faults": 447,
+          "branch_misses": 4578225
+        },
+        "sha256": {
+          "kbps": 78145.13,
+          "mbps": 78.15,
+          "cpu0": 21.73,
+          "cpu1": 21.68,
+          "cycles": 728499447,
+          "instructions": 174143226,
+          "context_switches": 6113,
+          "page_faults": 448,
+          "branch_misses": 4936052
+        },
+        "sha512": {
+          "kbps": 83099.65,
+          "mbps": 83.1,
+          "cpu0": 21.86,
+          "cpu1": 21.52,
+          "cycles": 749178894,
+          "instructions": 184781267,
+          "context_switches": 6650,
+          "page_faults": 447,
+          "branch_misses": 5234627
+        }
+      },
+      {
+        "block_bytes": 262144,
+        "sha1": {
+          "kbps": 75051.83,
+          "mbps": 75.05,
+          "cpu0": 17.38,
+          "cpu1": 19.0,
+          "cycles": 1002322518,
+          "instructions": 217978729,
+          "context_switches": 6179,
+          "page_faults": 510,
+          "branch_misses": 5265488
+        },
+        "sha256": {
+          "kbps": 82811.29,
+          "mbps": 82.81,
+          "cpu0": 15.38,
+          "cpu1": 23.41,
+          "cycles": 1079832674,
+          "instructions": 236791975,
+          "context_switches": 6724,
+          "page_faults": 511,
+          "branch_misses": 5652218
+        },
+        "sha512": {
+          "kbps": 86324.02,
+          "mbps": 86.32,
+          "cpu0": 16.68,
+          "cpu1": 23.91,
+          "cycles": 1134197268,
+          "instructions": 248645507,
+          "context_switches": 7023,
+          "page_faults": 510,
+          "branch_misses": 6014858
+        }
+      },
+      {
+        "block_bytes": 524288,
+        "sha1": {
+          "kbps": 74329.44,
+          "mbps": 74.33,
+          "cpu0": 17.85,
+          "cpu1": 20.38,
+          "cycles": 1693928682,
+          "instructions": 434182190,
+          "context_switches": 7546,
+          "page_faults": 639,
+          "branch_misses": 4843273
+        },
+        "sha256": {
+          "kbps": 82348.17,
+          "mbps": 82.35,
+          "cpu0": 18.83,
+          "cpu1": 22.12,
+          "cycles": 1888768724,
+          "instructions": 481133395,
+          "context_switches": 8085,
+          "page_faults": 639,
+          "branch_misses": 5429819
+        },
+        "sha512": {
+          "kbps": 85471.87,
+          "mbps": 85.47,
+          "cpu0": 18.41,
+          "cpu1": 23.14,
+          "cycles": 1930716975,
+          "instructions": 497274242,
+          "context_switches": 8222,
+          "page_faults": 639,
+          "branch_misses": 5530447
+        }
+      },
+      {
+        "block_bytes": 1048576,
+        "sha1": {
+          "kbps": 76179.05,
+          "mbps": 76.18,
+          "cpu0": 18.27,
+          "cpu1": 19.33,
+          "cycles": 1914229520,
+          "instructions": 542331364,
+          "context_switches": 9716,
+          "page_faults": 895,
+          "branch_misses": 4884911
+        },
+        "sha256": {
+          "kbps": 84577.79,
+          "mbps": 84.58,
+          "cpu0": 19.09,
+          "cpu1": 19.9,
+          "cycles": 2112973511,
+          "instructions": 595200480,
+          "context_switches": 10549,
+          "page_faults": 895,
+          "branch_misses": 5020944
+        },
+        "sha512": {
+          "kbps": 88394.96,
+          "mbps": 88.39,
+          "cpu0": 20.46,
+          "cpu1": 19.65,
+          "cycles": 2195356730,
+          "instructions": 622786692,
+          "context_switches": 11059,
+          "page_faults": 895,
+          "branch_misses": 5362443
+        }
+      }
+    ]
+  },
+  {
+    "implementation": "engine",
+    "timestamp": "2025-06-12T20:00:18Z",
+    "seconds_per_run": 5,
+    "blocks": [
+      {
+        "block_bytes": 16,
+        "sha1": {
+          "kbps": 217.49,
+          "mbps": 0.22,
+          "cpu0": 97.03,
+          "cpu1": 22.17,
+          "cycles": 3518884560,
+          "instructions": 1250653922,
+          "context_switches": 68026,
+          "page_faults": 382,
+          "branch_misses": 45274598
+        },
+        "sha256": {
+          "kbps": 216.53,
+          "mbps": 0.22,
+          "cpu0": 97.22,
+          "cpu1": 22.42,
+          "cycles": 3506904757,
+          "instructions": 1249645813,
+          "context_switches": 67725,
+          "page_faults": 381,
+          "branch_misses": 45967914
+        },
+        "sha512": {
+          "kbps": 200.28,
+          "mbps": 0.2,
+          "cpu0": 97.21,
+          "cpu1": 21.96,
+          "cycles": 3257566541,
+          "instructions": 1159642575,
+          "context_switches": 62647,
+          "page_faults": 381,
+          "branch_misses": 42999192
+        }
+      },
+      {
+        "block_bytes": 64,
+        "sha1": {
+          "kbps": 656.13,
+          "mbps": 0.66,
+          "cpu0": 79.16,
+          "cpu1": 35.16,
+          "cycles": 2699261827,
+          "instructions": 945941707,
+          "context_switches": 51325,
+          "page_faults": 382,
+          "branch_misses": 35549905
+        },
+        "sha256": {
+          "kbps": 649.54,
+          "mbps": 0.65,
+          "cpu0": 79.91,
+          "cpu1": 34.56,
+          "cycles": 2713550655,
+          "instructions": 939942116,
+          "context_switches": 50803,
+          "page_faults": 380,
+          "branch_misses": 35870877
+        },
+        "sha512": {
+          "kbps": 617.48,
+          "mbps": 0.62,
+          "cpu0": 80.23,
+          "cpu1": 33.03,
+          "cycles": 2572626963,
+          "instructions": 894404815,
+          "context_switches": 48302,
+          "page_faults": 380,
+          "branch_misses": 34285618
+        }
+      },
+      {
+        "block_bytes": 128,
+        "sha1": {
+          "kbps": 739.07,
+          "mbps": 0.74,
+          "cpu0": 67.38,
+          "cpu1": 48.16,
+          "cycles": 1868824007,
+          "instructions": 638811321,
+          "context_switches": 57862,
+          "page_faults": 381,
+          "branch_misses": 24435024
+        },
+        "sha256": {
+          "kbps": 745.29,
+          "mbps": 0.75,
+          "cpu0": 65.94,
+          "cpu1": 48.4,
+          "cycles": 1869457613,
+          "instructions": 645173664,
+          "context_switches": 58346,
+          "page_faults": 381,
+          "branch_misses": 25114419
+        },
+        "sha512": {
+          "kbps": 1229.95,
+          "mbps": 1.23,
+          "cpu0": 80.6,
+          "cpu1": 32.88,
+          "cycles": 2550220087,
+          "instructions": 891776380,
+          "context_switches": 48105,
+          "page_faults": 383,
+          "branch_misses": 34232568
+        }
+      },
+      {
+        "block_bytes": 256,
+        "sha1": {
+          "kbps": 1476.56,
+          "mbps": 1.48,
+          "cpu0": 65.24,
+          "cpu1": 47.95,
+          "cycles": 1825833596,
+          "instructions": 636378675,
+          "context_switches": 57828,
+          "page_faults": 382,
+          "branch_misses": 24374744
+        },
+        "sha256": {
+          "kbps": 1476.71,
+          "mbps": 1.48,
+          "cpu0": 66.2,
+          "cpu1": 47.44,
+          "cycles": 1836797840,
+          "instructions": 638716437,
+          "context_switches": 57834,
+          "page_faults": 382,
+          "branch_misses": 24746281
+        },
+        "sha512": {
+          "kbps": 1368.01,
+          "mbps": 1.37,
+          "cpu0": 64.6,
+          "cpu1": 47.71,
+          "cycles": 1725502248,
+          "instructions": 592973476,
+          "context_switches": 53559,
+          "page_faults": 383,
+          "branch_misses": 23116239
+        }
+      },
+      {
+        "block_bytes": 512,
+        "sha1": {
+          "kbps": 2890.75,
+          "mbps": 2.89,
+          "cpu0": 65.57,
+          "cpu1": 48.87,
+          "cycles": 1820721168,
+          "instructions": 625674645,
+          "context_switches": 56696,
+          "page_faults": 384,
+          "branch_misses": 23909278
+        },
+        "sha256": {
+          "kbps": 2900.28,
+          "mbps": 2.9,
+          "cpu0": 65.64,
+          "cpu1": 46.76,
+          "cycles": 1828987075,
+          "instructions": 628201823,
+          "context_switches": 56853,
+          "page_faults": 381,
+          "branch_misses": 24401473
+        },
+        "sha512": {
+          "kbps": 2715.14,
+          "mbps": 2.72,
+          "cpu0": 63.74,
+          "cpu1": 47.37,
+          "cycles": 1697308557,
+          "instructions": 589011384,
+          "context_switches": 53235,
+          "page_faults": 380,
+          "branch_misses": 22959506
+        }
+      },
+      {
+        "block_bytes": 1024,
+        "sha1": {
+          "kbps": 5605.38,
+          "mbps": 5.61,
+          "cpu0": 63.88,
+          "cpu1": 46.61,
+          "cycles": 1761691497,
+          "instructions": 606646727,
+          "context_switches": 55033,
+          "page_faults": 383,
+          "branch_misses": 23173029
+        },
+        "sha256": {
+          "kbps": 5658.62,
+          "mbps": 5.66,
+          "cpu0": 64.46,
+          "cpu1": 45.96,
+          "cycles": 1767637620,
+          "instructions": 613025891,
+          "context_switches": 55518,
+          "page_faults": 383,
+          "branch_misses": 23756142
+        },
+        "sha512": {
+          "kbps": 5291.42,
+          "mbps": 5.29,
+          "cpu0": 63.22,
+          "cpu1": 47.32,
+          "cycles": 1658855994,
+          "instructions": 575023190,
+          "context_switches": 51867,
+          "page_faults": 382,
+          "branch_misses": 22418521
+        }
+      },
+      {
+        "block_bytes": 2048,
+        "sha1": {
+          "kbps": 10428.01,
+          "mbps": 10.43,
+          "cpu0": 58.49,
+          "cpu1": 45.71,
+          "cycles": 1649801929,
+          "instructions": 577525395,
+          "context_switches": 51428,
+          "page_faults": 382,
+          "branch_misses": 22201675
+        },
+        "sha256": {
+          "kbps": 10561.13,
+          "mbps": 10.56,
+          "cpu0": 61.54,
+          "cpu1": 42.96,
+          "cycles": 1684802733,
+          "instructions": 586392494,
+          "context_switches": 52045,
+          "page_faults": 382,
+          "branch_misses": 22856617
+        },
+        "sha512": {
+          "kbps": 9932.8,
+          "mbps": 9.93,
+          "cpu0": 61.35,
+          "cpu1": 46.58,
+          "cycles": 1614093074,
+          "instructions": 553276745,
+          "context_switches": 48976,
+          "page_faults": 382,
+          "branch_misses": 21777224
+        }
+      },
+      {
+        "block_bytes": 4096,
+        "sha1": {
+          "kbps": 18268.16,
+          "mbps": 18.27,
+          "cpu0": 54.76,
+          "cpu1": 40.84,
+          "cycles": 1485631279,
+          "instructions": 508309678,
+          "context_switches": 44975,
+          "page_faults": 384,
+          "branch_misses": 19738158
+        },
+        "sha256": {
+          "kbps": 18883.38,
+          "mbps": 18.88,
+          "cpu0": 55.84,
+          "cpu1": 42.51,
+          "cycles": 1513392429,
+          "instructions": 524377981,
+          "context_switches": 46506,
+          "page_faults": 384,
+          "branch_misses": 20518445
+        },
+        "sha512": {
+          "kbps": 17886.41,
+          "mbps": 17.89,
+          "cpu0": 55.53,
+          "cpu1": 44.03,
+          "cycles": 1464611599,
+          "instructions": 498670676,
+          "context_switches": 44160,
+          "page_faults": 384,
+          "branch_misses": 19707749
+        }
+      },
+      {
+        "block_bytes": 8192,
+        "sha1": {
+          "kbps": 30118.71,
+          "mbps": 30.12,
+          "cpu0": 44.42,
+          "cpu1": 36.56,
+          "cycles": 1247604810,
+          "instructions": 429225869,
+          "context_switches": 37058,
+          "page_faults": 385,
+          "branch_misses": 16529259
+        },
+        "sha256": {
+          "kbps": 31252.48,
+          "mbps": 31.25,
+          "cpu0": 45.97,
+          "cpu1": 37.77,
+          "cycles": 1298518943,
+          "instructions": 446095819,
+          "context_switches": 38471,
+          "page_faults": 384,
+          "branch_misses": 17489306
+        },
+        "sha512": {
+          "kbps": 30259.61,
+          "mbps": 30.26,
+          "cpu0": 47.61,
+          "cpu1": 39.28,
+          "cycles": 1261237881,
+          "instructions": 432560727,
+          "context_switches": 37231,
+          "page_faults": 384,
+          "branch_misses": 17069721
+        }
+      },
+      {
+        "block_bytes": 16384,
+        "sha1": {
+          "kbps": 44154.88,
+          "mbps": 44.15,
+          "cpu0": 36.29,
+          "cpu1": 31.11,
+          "cycles": 986420960,
+          "instructions": 331645347,
+          "context_switches": 27337,
+          "page_faults": 391,
+          "branch_misses": 12309542
+        },
+        "sha256": {
+          "kbps": 47903.54,
+          "mbps": 47.9,
+          "cpu0": 35.12,
+          "cpu1": 32.43,
+          "cycles": 1045409140,
+          "instructions": 358634000,
+          "context_switches": 29544,
+          "page_faults": 389,
+          "branch_misses": 13516723
+        },
+        "sha512": {
+          "kbps": 47133.49,
+          "mbps": 47.13,
+          "cpu0": 37.66,
+          "cpu1": 32.98,
+          "cycles": 1021534666,
+          "instructions": 353353739,
+          "context_switches": 29044,
+          "page_faults": 389,
+          "branch_misses": 13364215
+        }
+      },
+      {
+        "block_bytes": 32768,
+        "sha1": {
+          "kbps": 58844.77,
+          "mbps": 58.84,
+          "cpu0": 24.95,
+          "cpu1": 25.0,
+          "cycles": 736517211,
+          "instructions": 244027089,
+          "context_switches": 18530,
+          "page_faults": 397,
+          "branch_misses": 8417675
+        },
+        "sha256": {
+          "kbps": 63995.9,
+          "mbps": 64.0,
+          "cpu0": 27.93,
+          "cpu1": 26.77,
+          "cycles": 788530044,
+          "instructions": 264315537,
+          "context_switches": 20012,
+          "page_faults": 397,
+          "branch_misses": 9268721
+        },
+        "sha512": {
+          "kbps": 64782.34,
+          "mbps": 64.78,
+          "cpu0": 32.08,
+          "cpu1": 29.0,
+          "cycles": 789220737,
+          "instructions": 267105248,
+          "context_switches": 20199,
+          "page_faults": 396,
+          "branch_misses": 9386900
+        }
+      },
+      {
+        "block_bytes": 65536,
+        "sha1": {
+          "kbps": 70372.56,
+          "mbps": 70.37,
+          "cpu0": 21.55,
+          "cpu1": 20.98,
+          "cycles": 537260203,
+          "instructions": 173167138,
+          "context_switches": 11329,
+          "page_faults": 414,
+          "branch_misses": 5319456
+        },
+        "sha256": {
+          "kbps": 78485.91,
+          "mbps": 78.49,
+          "cpu0": 21.89,
+          "cpu1": 21.29,
+          "cycles": 579690615,
+          "instructions": 190758503,
+          "context_switches": 12454,
+          "page_faults": 413,
+          "branch_misses": 5928503
+        },
+        "sha512": {
+          "kbps": 79613.13,
+          "mbps": 79.61,
+          "cpu0": 23.4,
+          "cpu1": 23.96,
+          "cycles": 611409376,
+          "instructions": 194215671,
+          "context_switches": 12781,
+          "page_faults": 413,
+          "branch_misses": 6084554
+        }
+      },
+      {
+        "block_bytes": 131072,
+        "sha1": {
+          "kbps": 74160.54,
+          "mbps": 74.16,
+          "cpu0": 16.6,
+          "cpu1": 22.37,
+          "cycles": 480678565,
+          "instructions": 129789572,
+          "context_switches": 5908,
+          "page_faults": 448,
+          "branch_misses": 3568525
+        },
+        "sha256": {
+          "kbps": 82575.36,
+          "mbps": 82.58,
+          "cpu0": 18.82,
+          "cpu1": 23.87,
+          "cycles": 527539874,
+          "instructions": 143048403,
+          "context_switches": 6572,
+          "page_faults": 449,
+          "branch_misses": 3983715
+        },
+        "sha512": {
+          "kbps": 86533.73,
+          "mbps": 86.53,
+          "cpu0": 20.0,
+          "cpu1": 22.7,
+          "cycles": 544365082,
+          "instructions": 149642619,
+          "context_switches": 6986,
+          "page_faults": 448,
+          "branch_misses": 4208417
+        }
+      },
+      {
+        "block_bytes": 262144,
+        "sha1": {
+          "kbps": 75733.4,
+          "mbps": 75.73,
+          "cpu0": 14.27,
+          "cpu1": 22.57,
+          "cycles": 736764542,
+          "instructions": 179142029,
+          "context_switches": 6240,
+          "page_faults": 511,
+          "branch_misses": 3962099
+        },
+        "sha256": {
+          "kbps": 83990.94,
+          "mbps": 83.99,
+          "cpu0": 15.33,
+          "cpu1": 23.76,
+          "cycles": 820756501,
+          "instructions": 197389159,
+          "context_switches": 6864,
+          "page_faults": 510,
+          "branch_misses": 4422434
+        },
+        "sha512": {
+          "kbps": 88159.03,
+          "mbps": 88.16,
+          "cpu0": 16.67,
+          "cpu1": 21.44,
+          "cycles": 858667809,
+          "instructions": 207181579,
+          "context_switches": 7247,
+          "page_faults": 512,
+          "branch_misses": 4708116
+        }
+      },
+      {
+        "block_bytes": 524288,
+        "sha1": {
+          "kbps": 74833.37,
+          "mbps": 74.83,
+          "cpu0": 18.06,
+          "cpu1": 19.84,
+          "cycles": 1490734313,
+          "instructions": 410198721,
+          "context_switches": 7604,
+          "page_faults": 639,
+          "branch_misses": 4081819
+        },
+        "sha256": {
+          "kbps": 82607.67,
+          "mbps": 82.61,
+          "cpu0": 16.38,
+          "cpu1": 22.75,
+          "cycles": 1620818424,
+          "instructions": 450106789,
+          "context_switches": 8127,
+          "page_faults": 639,
+          "branch_misses": 4417460
+        },
+        "sha512": {
+          "kbps": 85878.37,
+          "mbps": 85.88,
+          "cpu0": 18.41,
+          "cpu1": 22.4,
+          "cycles": 1707957807,
+          "instructions": 468081994,
+          "context_switches": 8392,
+          "page_faults": 641,
+          "branch_misses": 4645951
+        }
+      },
+      {
+        "block_bytes": 1048576,
+        "sha1": {
+          "kbps": 75969.33,
+          "mbps": 75.97,
+          "cpu0": 17.59,
+          "cpu1": 19.54,
+          "cycles": 1767640730,
+          "instructions": 517110949,
+          "context_switches": 9716,
+          "page_faults": 896,
+          "branch_misses": 3942658
+        },
+        "sha256": {
+          "kbps": 84620.08,
+          "mbps": 84.62,
+          "cpu0": 18.95,
+          "cpu1": 19.83,
+          "cycles": 1930583921,
+          "instructions": 576637713,
+          "context_switches": 10608,
+          "page_faults": 895,
+          "branch_misses": 4582861
+        },
+        "sha512": {
+          "kbps": 88245.98,
+          "mbps": 88.25,
+          "cpu0": 20.36,
+          "cpu1": 20.03,
+          "cycles": 2068896564,
+          "instructions": 601229335,
+          "context_switches": 11044,
+          "page_faults": 895,
+          "branch_misses": 4772903
+        }
+      }
+    ]
+  }
+]

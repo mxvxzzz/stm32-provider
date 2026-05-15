@@ -64,6 +64,7 @@ static unsigned int stm32_cryptodev_mac_from_name(const char *alg_name)
     /*
      * SHA3 not available in cryptodev.h
      */
+
     return 0;
 }
 
