@@ -61,6 +61,10 @@ The project is split into clear layers:
 
 ![Architecture Crypto](./images/drawio.svg)
 
+## Architecture Provider STM32MPU
+
+![Architecture Crypto](./images/stprovider.svg)
+
 ## How to load the provider
 
 OpenSSL command-line tools accept provider options such as -provider and -provider-path, and openssl list can display loaded providers, provider versions, and available algorithms.
@@ -98,4 +102,4 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 ## Benchmark Results
 You can view the latest performance reports for SHA-1, SHA-256, and SHA-512 here:
 
-👉 [View Benchmark Report](https://mxvxzzz.github.io/stm32-provider/bench/st_sha_benchmark.html)
+👉 [View Benchmark Report](https://mxvxzzz.github.io/stm32-provider/bench/index.html)
