@@ -1,25 +1,40 @@
 # STM32MPU Provider
 
-Experimental OpenSSL 3 provider implementing digest algorithms through the Linux AF_ALG interface. In OpenSSL terms, a provider is a unit of code that offers implementations for operations such as digests, ciphers, signatures, and more.
+Experimental OpenSSL 3 provider implementing digest algorithms through the Linux AF_ALG and Cryptodev interface. In OpenSSL terms, a provider is a unit of code that offers implementations for operations such as digests, ciphers, signatures, and more.
+
+Here is a overviweuw of the CryptoAPI architecture, from User space to hardware
+
+## CryptoAPI overview with ST Provider
+
+![Architecture Crypto](./images/drawio.svg)
+
+### Project Layout & Components
 
 This project uses:
 - A custom OpenSSL provider module: `stm32_provider.so`
-- Implementations through `AF_ALG`
-- `libprov` for provider error helpers
-- `bear` to generate `compile_commands.json` for editor integration
-
+- Implementations through `AF_ALG` and `Cryptodev`
+- `libprov` : A helper library used for provider-side error reporting
+- `include/err.h` + `err.c` : Provides provider-specific error handling and reason strings
+- `bear` : A command-line tool used to generate `compile_commands.json` for editor integration
 ---
 
-## Goals
+Here is a diagram showing the internal components of the provider:
 
-This project aims to:
+## Architecture Provider STM32MPU
 
-- understand OpenSSL 3 provider internals
-- implement each operation supported by the provider
-- connect OpenSSL digest dispatch with Linux kernel crypto through AF_ALG and cryptodev
-- prepare a framework for benchmarking different crypto paths: AF_ALG, cryptodev, legacy engines, and software implementations
+![Architecture Crypto](./images/stprovider.svg)
 
----
+### Internal Workflow
+
+- **Entry Point (`prov.c`):** The main entry point that registers the provider and sets up the OpenSSL dispatch tables for the supported operations (Digests, Ciphers, etc.).
+
+- **Operation Layer (`digest/`, `cipher/`):** Implements the standard OpenSSL interfaces (`newctx`, `init`, `update`, `final`) to dispatch algorithms cleanly.
+
+- **Precompilation Switch:** A build-time configuration flag that selects the targeted Linux kernel API backend.
+
+- **Kernel Backends:** Depending on the precompilation switch, the code utilizes dedicated source files tailored for each interface—either using Linux `AF_ALG` (e.g., `*_afalg.c`) or `Cryptodev` with `/dev/crypto` (e.g., `*_cryptodev.c`) to bridge operations like digests, ciphers, or HMACs with the kernel.
+
+- **Hardware Acceleration:** The Linux Crypto API routes these requests directly to the dedicated **STM32 HASH or CRYP Processors** via their respective drivers.
 
 ## Supported digests
 
@@ -35,35 +50,6 @@ Currently implemented:
 - SHA3-512
 
 ---
-
-## Architecture
-
-The project is split into clear layers:
-
-- `prov.c`  
-  provider entry point and provider dispatch table
-
-- `digest/digest.c`  
-  OpenSSL-facing digest layer (`newctx`, `init`, `update`, `final`, provider digest dispatch)
-
-- `digest/hash_afalg.c`  
-  AF_ALG-facing layer (`socket`, `bind`, `accept`, `write`, `read`)
-
-- `include/err.h` + `err.c`  
-  provider-specific error handling and reason strings
-
-- `libprov/`  
-  helper library used for provider-side error reporting
-
----
-
-## Architecture diagram
-
-![Architecture Crypto](./images/drawio.svg)
-
-## Architecture Provider STM32MPU
-
-![Architecture Crypto](./images/stprovider.svg)
 
 ## How to load the provider
 
