@@ -8,7 +8,7 @@ Here is a overviweuw of the CryptoAPI architecture, from User space to hardware
 
 ![Architecture Crypto](./images/drawio.svg)
 
-### Project Layout & Components
+## Project Layout & Components
 
 This project uses:
 - A custom OpenSSL provider module: `stm32_provider.so`
@@ -20,7 +20,7 @@ This project uses:
 
 Here is a diagram showing the internal components of the provider:
 
-## Architecture Provider STM32MPU
+### Architecture Provider STM32MPU
 
 ![Architecture Crypto](./images/stprovider.svg)
 
