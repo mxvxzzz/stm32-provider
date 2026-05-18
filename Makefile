@@ -31,16 +31,19 @@ TARGET = stm32_provider.so
 SRCS = prov.c \
        err.c \
        digest/digest.c \
+       hmac/hmac.c \
        libprov/err.c \
        libprov/num.c
 
 ifeq ($(BACKEND),afalg)
 SRCS += digest/hash_afalg.c
+SRCS += hmac/hmac_afalg.c
 CPPFLAGS += -DBACKEND_AFALG # SHA3 in digest.c
 endif
 
 ifeq ($(BACKEND),cryptodev)
 SRCS += digest/hash_cryptodev.c
+SRCS += hmac/hmac_cryptodev.c
 CPPFLAGS += -I./warning/include # tempo(SDK)  -I/usr/local/include/
 CPPFLAGS += -DBACKEND_CRYPTODEV # SHA3 not available for cryptodev / in digest.c
 endif
