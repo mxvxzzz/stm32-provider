@@ -24,7 +24,7 @@
 PKG_CONFIG ?= pkg-config
 
 # config ( dev / release ) ( afalg / cryptodev )
-BUILD ?= release
+BUILD ?= dev
 BACKEND ?= afalg
 
 TARGET = stm32_provider.so

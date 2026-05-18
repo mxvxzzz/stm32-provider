@@ -12,6 +12,8 @@
 #include "digest.h"
 #include "../include/err.h"
 
+#define CRYPTODEV_BUF_MAX (256 * 1024)  /* 256 KB accumulation buffer */
+
 /* prototypes Cryptodev helpers / / static */
 static unsigned int stm32_cryptodev_mac_from_name(const char *alg_name);  
 static void stm32_cryptodev_close_session(STM32_HASH_CTX *ctx);
@@ -35,11 +37,14 @@ struct stm32_hash_ctx_st {
     const char *alg_name;
     size_t digest_len;
     int started;
+    unsigned char *buf;
+    size_t buf_len;
+    size_t buf_max;
 };
 
 /*********************************************************************
  *
- *  Helpers functions for Cryptodev inerfacing
+ *  Helpers functions for Cryptodev interfacing
  *
  *****/
 static unsigned int stm32_cryptodev_mac_from_name(const char *alg_name)
@@ -171,11 +176,23 @@ STM32_HASH_CTX *stm32_hash_newctx(void *vprovctx, const char *alg_name,
     ctx->alg_name = alg_name;
     ctx->digest_len = digest_len;
     ctx->started = 0;
+    ctx->buf_max = CRYPTODEV_BUF_MAX;
+    ctx->buf_len = 0;
+
+    /* Allocate the accumulation buffer once for the lifetime of the context */
+    ctx->buf = OPENSSL_malloc(ctx->buf_max);
+    if (ctx->buf == NULL) {
+        PUT_ERROR(provctx, STM32_R_HASH_NEWCTX_FAILED,
+                  "failed to allocate cryptodev accumulation buffer");
+        OPENSSL_free(ctx);
+        return NULL;
+    }
 
     ctx->cfd = open("/dev/crypto", O_RDWR, 0);
     if (ctx->cfd < 0) {
         PUT_ERROR_ERRNO(provctx, STM32_R_HASH_NEWCTX_FAILED,
                         "open /dev/crypto");
+        OPENSSL_free(ctx->buf);
         OPENSSL_free(ctx);
         return NULL;
     }
@@ -195,6 +212,7 @@ void stm32_hash_freectx(STM32_HASH_CTX *ctx)
         ctx->cfd = -1;
     }
 
+    OPENSSL_free(ctx->buf);
     OPENSSL_free(ctx);
 }
 
@@ -209,17 +227,22 @@ int stm32_hash_init(STM32_HASH_CTX *ctx)
         return 0;
     }
 
+    /* Reset accumulation buffer and reopen session */
+    ctx->buf_len = 0;
+    ctx->started = 0;
+
     stm32_cryptodev_close_session(ctx);
 
     if (!stm32_cryptodev_open_session(ctx))
         return 0;
 
-    ctx->started = 0;
     return 1;
 }
 
 int stm32_hash_update(STM32_HASH_CTX *ctx, const unsigned char *in, size_t inl)
 {
+    size_t       space;
+    size_t       to_copy;
     unsigned int flags;
 
     if (ctx == NULL)
@@ -240,14 +263,35 @@ int stm32_hash_update(STM32_HASH_CTX *ctx, const unsigned char *in, size_t inl)
         return 0;
     }
 
-    flags = COP_FLAG_UPDATE;
-    if (!ctx->started)
-        flags |= COP_FLAG_RESET;
+    /*
+     * Accumulate data into the buffer.
+     * When the buffer reaches buf_max (256 KB), flush it to the driver
+     * and reset the buffer.
+     * Repeat until all input is consumed.
+     */
+    while (inl > 0) {
+        space   = ctx->buf_max - ctx->buf_len;
+        to_copy = (inl < space) ? inl : space;
 
-    if (!stm32_cryptodev_crypt(ctx, in, inl, flags, NULL))
-        return 0;
+        memcpy(ctx->buf + ctx->buf_len, in, to_copy);
+        ctx->buf_len += to_copy;
+        in           += to_copy;
+        inl          -= to_copy;
 
-    ctx->started = 1;
+        /* Buffer full: flush to driver, more data will follow */
+        if (ctx->buf_len == ctx->buf_max) {
+            flags = COP_FLAG_UPDATE;
+            if (!ctx->started)
+                flags |= COP_FLAG_RESET;
+
+            if (!stm32_cryptodev_crypt(ctx, ctx->buf, ctx->buf_len, flags, NULL))
+                return 0;
+
+            ctx->started = 1;
+            ctx->buf_len = 0;
+        }
+    }
+
     return 1;
 }
 
@@ -270,6 +314,23 @@ int stm32_hash_final(STM32_HASH_CTX *ctx, unsigned char *out, size_t *outl)
         return 0;
     }
 
+    /*
+     * Flush any remaining buffered data before finalizing.
+     * If buf_len == 0 and started == 0: empty message, skip UPDATE.
+     */
+    if (ctx->buf_len > 0) {
+        flags = COP_FLAG_UPDATE;
+        if (!ctx->started)
+            flags |= COP_FLAG_RESET;
+
+        if (!stm32_cryptodev_crypt(ctx, ctx->buf, ctx->buf_len, flags, NULL))
+            return 0;
+
+        ctx->started = 1;
+        ctx->buf_len = 0;
+    }
+
+    /* Finalize: retrieve the digest */
     flags = COP_FLAG_FINAL;
     if (!ctx->started)
         flags |= COP_FLAG_RESET;
