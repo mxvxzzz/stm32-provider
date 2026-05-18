@@ -3,6 +3,7 @@
 #include <openssl/core_names.h>
 #include <openssl/params.h>
 #include "include/prov.h"
+#include "hmac/hmac.h"
 #include "include/err.h"   // libprov — proverr_new_handle, proverr_free_handle
 
 /* forward declarations with types OSSL_FUNC_**/
@@ -80,6 +81,8 @@ static const OSSL_ALGORITHM *prov_query(void *provctx, int operation_id, int *no
     switch (operation_id){
         case OSSL_OP_DIGEST : 
             return stm32_digests;
+        case OSSL_OP_MAC :
+            return stm32_macs;
         /* 
         case OSSL_OP_CIPHER : 
             return stm32_cipher

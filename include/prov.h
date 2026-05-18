@@ -2,8 +2,8 @@
 #define PROV_H
 
 #include<openssl/core_dispatch.h>
-#include<openssl/proverr.h>
 #include<openssl/core.h>
+#include <openssl/types.h>  // for OSSL_ALGORITHM, OSSL_DISPATCH, OSSL_ITEM
 
 
 typedef struct proverr_functions_st PROV_ERR;
@@ -23,6 +23,7 @@ void provider_ctx_free(PROV_CTX *ctx);
 
 /* Algorithms supported */
 extern const OSSL_ALGORITHM stm32_digests[];
+extern const OSSL_ALGORITHM stm32_macs[];
 //extern const OSSL_ALGORITHM stm32_cipher[];
 
 /* Strings error supported / names coherent with err.c */

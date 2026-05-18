@@ -20,6 +20,8 @@
 #define STM32_NAME_SHA3_384  "SHA3-384:2.16.840.1.101.3.4.2.9"
 #define STM32_NAME_SHA3_512  "SHA3-512:2.16.840.1.101.3.4.2.10"
 
+/* MACs */
+#define STM32_NAME_HMAC         "HMAC"
 
 /* Prpts */
 #define STM32_PROV_PROPS        "provider=stm32"

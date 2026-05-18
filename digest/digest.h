@@ -3,7 +3,8 @@
 
 
 #include <openssl/core.h>
-
+#include <openssl/types.h>  // for OSSL_ALGORITHM
+#include <stddef.h>         // for size_t
 /* Opaque type for the AF_ALG / Cryptodev hash context 
  *
  *  Provider global context
