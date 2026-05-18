@@ -3,4 +3,5 @@
 *.d
 text.txt
 compile_commands.json
+warning/
 bench/.venv/
