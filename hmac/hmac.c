@@ -55,36 +55,6 @@ typedef struct {
     size_t digest_size;
 } HMAC_ALG_MAP;
 
-static const HMAC_ALG_MAP hmac_alg_map[] = {
-    { "SHA1",     "hmac(sha1)",   20 },
-    { "SHA-1",    "hmac(sha1)",   20 },
-    { "SHA256",   "hmac(sha256)", 32 },
-    { "SHA-256",  "hmac(sha256)", 32 },
-    { "SHA2-256", "hmac(sha256)", 32 },
-    { "SHA384",   "hmac(sha384)", 48 },
-    { "SHA-384",  "hmac(sha384)", 48 },
-    { "SHA2-384", "hmac(sha384)", 48 },
-    { "SHA512",   "hmac(sha512)", 64 },
-    { "SHA-512",  "hmac(sha512)", 64 },
-    { "SHA2-512", "hmac(sha512)", 64 },
-#ifdef BACKEND_AFALG
-    { "SHA3-224", "hmac(sha3-224)", 28 },
-    { "SHA3-256", "hmac(sha3-256)", 32 },
-    { "SHA3-384", "hmac(sha3-384)", 48 },
-    { "SHA3-512", "hmac(sha3-512)", 64 },
-#endif
-    { NULL, NULL, 0 }
-};
-
-static const HMAC_ALG_MAP *hmac_lookup(const char *ossl_name)
-{
-    const HMAC_ALG_MAP *m;
-    for (m = hmac_alg_map; m->ossl_name != NULL; m++)
-        if (OPENSSL_strcasecmp(m->ossl_name, ossl_name) == 0)
-            return m;
-    return NULL;
-}
-
 /*********************************************************************
  *
  *  Setup
@@ -182,12 +152,6 @@ static int mac_init(void *vctx, const unsigned char *key, size_t keylen,
     if (params != NULL && !mac_set_ctx_params(ctx, params))
         return 0;
 
-    if (!ctx->digest_set) {
-        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
-                  "HMAC digest not set! use OSSL_MAC_PARAM_DIGEST");
-        return 0;
-    }
-
     /* store key for dupctx */
     if (key != NULL && keylen > 0) {
         if (ctx->key) {
@@ -198,6 +162,18 @@ static int mac_init(void *vctx, const unsigned char *key, size_t keylen,
         if (!ctx->key)
             return 0;
         ctx->keylen = keylen;
+    }
+
+    if (!ctx->digest_set) {
+        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
+                  "HMAC digest not set! use OSSL_MAC_PARAM_DIGEST");
+        return 0;
+    }
+
+    if (ctx->key == NULL || ctx->keylen == 0) {
+        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
+                  "HMAC key not set");
+        return 0;
     }
 
     /* create hmac_ctx if not yet done */
@@ -255,6 +231,41 @@ static int mac_final(void *vctx, unsigned char *out, size_t *outl,
  * Params
  *
  *****/
+ static const HMAC_ALG_MAP hmac_alg_map[] = {
+    { "MD5",       "hmac(md5)",    16 },
+    { "MD-5",      "hmac(md5)",    16 },
+    { "SHA1",      "hmac(sha1)",   20 },
+    { "SHA-1",     "hmac(sha1)",   20 },
+    {"SHA224",     "hmac(sha224)", 28 },
+    {"SHA-224",    "hmac(sha224)", 28 },
+    {"SHA2-224",   "hmac(sha224)", 28 },
+    { "SHA256",    "hmac(sha256)", 32 },
+    { "SHA-256",   "hmac(sha256)", 32 },
+    { "SHA2-256",  "hmac(sha256)", 32 },
+    { "SHA384",   "hmac(sha384)", 48 },
+    { "SHA-384",  "hmac(sha384)", 48 },
+    { "SHA2-384", "hmac(sha384)", 48 },
+    { "SHA512",   "hmac(sha512)", 64 },
+    { "SHA-512",  "hmac(sha512)", 64 },
+    { "SHA2-512", "hmac(sha512)", 64 },
+#ifdef BACKEND_AFALG
+    { "SHA3-224", "hmac(sha3-224)", 28 },
+    { "SHA3-256", "hmac(sha3-256)", 32 },
+    { "SHA3-384", "hmac(sha3-384)", 48 },
+    { "SHA3-512", "hmac(sha3-512)", 64 },
+#endif
+    { NULL, NULL, 0 }
+};
+
+static const HMAC_ALG_MAP *hmac_lookup(const char *ossl_name)
+{
+    const HMAC_ALG_MAP *m;
+    for (m = hmac_alg_map; m->ossl_name != NULL; m++)
+        if (OPENSSL_strcasecmp(m->ossl_name, ossl_name) == 0)
+            return m;
+    return NULL;
+}
+
 static const OSSL_PARAM mac_known_gettable_params[] = {
     OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE, NULL),
     OSSL_PARAM_END
@@ -262,10 +273,7 @@ static const OSSL_PARAM mac_known_gettable_params[] = {
 
 static const OSSL_PARAM *mac_gettable_params(void *provctx)
 {
-    PROV_CTX *pctx = (PROV_CTX *)provctx;
-    if (pctx == NULL)
-        return NULL;
-
+    (void)provctx;
     return mac_known_gettable_params;
 }
 
@@ -279,16 +287,14 @@ static int mac_get_params(OSSL_PARAM params[])
 }
 
 static const OSSL_PARAM mac_known_gettable_ctx_params[] = {
-    OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE,        NULL),
+    OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE, NULL),
     OSSL_PARAM_utf8_string(OSSL_MAC_PARAM_DIGEST, NULL, 0),
     OSSL_PARAM_END
 };
 static const OSSL_PARAM *mac_gettable_ctx_params(void *vctx, void *provctx)
 {
-    STM32_MAC_CTX *ctx = (STM32_MAC_CTX *)vctx;
-    if (ctx == NULL || provctx == NULL)
-        return NULL;
-
+    (void)vctx;
+    (void)provctx;
     return mac_known_gettable_ctx_params;
 }
 
@@ -310,15 +316,14 @@ static int mac_get_ctx_params(void *vctx, OSSL_PARAM params[])
 
 static const OSSL_PARAM mac_known_settable_ctx_params[] = {
     OSSL_PARAM_utf8_string(OSSL_MAC_PARAM_DIGEST, NULL, 0),
+    OSSL_PARAM_octet_string(OSSL_MAC_PARAM_KEY,   NULL, 0),
     OSSL_PARAM_END
 };
 
 static const OSSL_PARAM *mac_settable_ctx_params(void *vctx, void *provctx)
 {
-    STM32_MAC_CTX *ctx = (STM32_MAC_CTX *)vctx;
-    if (ctx == NULL || provctx == NULL)
-        return NULL;
-
+    (void)vctx;
+    (void)provctx;
     return mac_known_settable_ctx_params;
 }
 
@@ -327,33 +332,47 @@ static int mac_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     STM32_MAC_CTX *ctx = (STM32_MAC_CTX *)vctx;
     const OSSL_PARAM *p;
     const HMAC_ALG_MAP *m;
-    char digest_buf[64];
+    const char *digest_name = NULL;
 
     p = OSSL_PARAM_locate_const(params, OSSL_MAC_PARAM_DIGEST);
     if (p != NULL) {
-        if (p->data == NULL || p->data_size == 0)
+        if (!OSSL_PARAM_get_utf8_string_ptr(p, &digest_name)
+                || digest_name == NULL)
             return 0;
 
-        OPENSSL_strlcpy(digest_buf, (const char *)p->data, sizeof(digest_buf));
-
-        m = hmac_lookup(digest_buf);
+        m = hmac_lookup(digest_name);
         if (m == NULL) {
             PUT_ERROR((PROV_CTX *)ctx->provctx,
                       STM32_R_UNSUPPORTED_OPERATION,
-                      "unsupported HMAC digest: %s", digest_buf);
+                      "unsupported HMAC digest: %s", digest_name);
             return 0;
         }
 
-        OPENSSL_strlcpy(ctx->digest_name, digest_buf, sizeof(ctx->digest_name));
+        OPENSSL_strlcpy(ctx->digest_name, digest_name, sizeof(ctx->digest_name));
         OPENSSL_strlcpy(ctx->alg_name, m->alg_name, sizeof(ctx->alg_name));
         ctx->digest_size = m->digest_size;
         ctx->digest_set = 1;
 
-        /* destroy old hmac_ctx if digest changes */
         if (ctx->hmac_ctx) {
             stm32_hmac_freectx(ctx->hmac_ctx);
             ctx->hmac_ctx = NULL;
         }
+    }
+
+    p = OSSL_PARAM_locate_const(params, OSSL_MAC_PARAM_KEY);
+    if (p != NULL) {
+        unsigned char *new_key = NULL;
+        size_t new_keylen = 0;
+
+        if (!OSSL_PARAM_get_octet_string(p, (void **)&new_key, 0, &new_keylen))
+            return 0;
+
+        if (ctx->key) {
+            OPENSSL_cleanse(ctx->key, ctx->keylen);
+            OPENSSL_free(ctx->key);
+        }
+        ctx->key = new_key;
+        ctx->keylen = new_keylen;
     }
 
     return 1;
