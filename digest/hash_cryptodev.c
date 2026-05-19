@@ -52,6 +52,9 @@ static unsigned int stm32_cryptodev_mac_from_name(const char *alg_name)
     if (alg_name == NULL)
         return 0;
 
+    if (strcmp(alg_name, "md5") == 0)
+        return CRYPTO_MD5;
+
     if (strcmp(alg_name, "sha1") == 0)
         return CRYPTO_SHA1;
 

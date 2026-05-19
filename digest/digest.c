@@ -184,6 +184,7 @@ static const OSSL_PARAM *digests_gettable_params(void *provctx)
     }
 
 /* Define the digest functions for each supported algorithm */
+DEFINE_DIGEST(md5,     "md5",       16,  64);
 DEFINE_DIGEST(sha1,     "sha1",     20,  64);
 DEFINE_DIGEST(sha224,   "sha224",   28,  64);
 DEFINE_DIGEST(sha256,   "sha256",   32,  64);
@@ -197,6 +198,9 @@ DEFINE_DIGEST(sha3_512, "sha3-512", 64,  72);
 #endif
 /* Table of supported digest algorithms returned by the provider to the Core OpenSSL */
 const OSSL_ALGORITHM stm32_digests[] = {
+    { STM32_NAME_MD5,     STM32_PROV_PROPS, md5_functions,
+      "STM32 MD5"},
+      
     { STM32_NAME_SHA1,     STM32_PROV_PROPS, sha1_functions,
       "STM32 SHA-1"},
 
