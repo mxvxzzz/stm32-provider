@@ -24,6 +24,12 @@ static int mac_init(void *vctx, const unsigned char *key, size_t keylen,
 static int mac_update(void *vctx, const unsigned char *in, size_t inl);
 static int mac_final(void *vctx, unsigned char *out, size_t *outl,
                         size_t outsize);
+static int mac_get_params(OSSL_PARAM params[]);
+static const OSSL_PARAM *mac_gettable_params(void *provctx);
+static int mac_get_ctx_params(void *vctx, OSSL_PARAM params[]);
+static const OSSL_PARAM *mac_gettable_ctx_params(void *vctx, void *provctx);
+static int mac_set_ctx_params(void *vctx, const OSSL_PARAM params[]);
+static const OSSL_PARAM *mac_settable_ctx_params(void *vctx, void *provctx);
 
 /*********************************************************************
  *
@@ -243,3 +249,139 @@ static int mac_final(void *vctx, unsigned char *out, size_t *outl,
 
     return stm32_hmac_final(ctx->hmac_ctx, out, outl);
 }
+
+/*********************************************************************
+ *
+ * Params
+ *
+ *****/
+static const OSSL_PARAM mac_known_gettable_params[] = {
+    OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE, NULL),
+    OSSL_PARAM_END
+};
+
+static const OSSL_PARAM *mac_gettable_params(void *provctx)
+{
+    PROV_CTX *pctx = (PROV_CTX *)provctx;
+    if (pctx == NULL)
+        return NULL;
+
+    return mac_known_gettable_params;
+}
+
+static int mac_get_params(OSSL_PARAM params[])
+{
+    OSSL_PARAM *p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_SIZE);
+    if (p != NULL && !OSSL_PARAM_set_size_t(p, 0))
+        return 0;
+
+    return 1;
+}
+
+static const OSSL_PARAM mac_known_gettable_ctx_params[] = {
+    OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE,        NULL),
+    OSSL_PARAM_utf8_string(OSSL_MAC_PARAM_DIGEST, NULL, 0),
+    OSSL_PARAM_END
+};
+static const OSSL_PARAM *mac_gettable_ctx_params(void *vctx, void *provctx)
+{
+    STM32_MAC_CTX *ctx = (STM32_MAC_CTX *)vctx;
+    if (ctx == NULL || provctx == NULL)
+        return NULL;
+
+    return mac_known_gettable_ctx_params;
+}
+
+static int mac_get_ctx_params(void *vctx, OSSL_PARAM params[])
+{
+    STM32_MAC_CTX *ctx = (STM32_MAC_CTX *)vctx;
+    OSSL_PARAM *p;
+
+    p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_SIZE);
+    if (p != NULL && !OSSL_PARAM_set_size_t(p, ctx->digest_size))
+        return 0;
+
+    p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_DIGEST);
+    if (p != NULL && !OSSL_PARAM_set_utf8_string(p, ctx->digest_name))
+        return 0;
+
+    return 1;
+}
+
+static const OSSL_PARAM mac_known_settable_ctx_params[] = {
+    OSSL_PARAM_utf8_string(OSSL_MAC_PARAM_DIGEST, NULL, 0),
+    OSSL_PARAM_END
+};
+
+static const OSSL_PARAM *mac_settable_ctx_params(void *vctx, void *provctx)
+{
+    STM32_MAC_CTX *ctx = (STM32_MAC_CTX *)vctx;
+    if (ctx == NULL || provctx == NULL)
+        return NULL;
+
+    return mac_known_settable_ctx_params;
+}
+
+static int mac_set_ctx_params(void *vctx, const OSSL_PARAM params[])
+{
+    STM32_MAC_CTX *ctx = (STM32_MAC_CTX *)vctx;
+    const OSSL_PARAM *p;
+    const HMAC_ALG_MAP *m;
+    char digest_buf[64];
+
+    p = OSSL_PARAM_locate_const(params, OSSL_MAC_PARAM_DIGEST);
+    if (p != NULL) {
+        if (p->data == NULL || p->data_size == 0)
+            return 0;
+
+        OPENSSL_strlcpy(digest_buf, (const char *)p->data, sizeof(digest_buf));
+
+        m = hmac_lookup(digest_buf);
+        if (m == NULL) {
+            PUT_ERROR((PROV_CTX *)ctx->provctx,
+                      STM32_R_UNSUPPORTED_OPERATION,
+                      "unsupported HMAC digest: %s", digest_buf);
+            return 0;
+        }
+
+        OPENSSL_strlcpy(ctx->digest_name, digest_buf, sizeof(ctx->digest_name));
+        OPENSSL_strlcpy(ctx->alg_name, m->alg_name, sizeof(ctx->alg_name));
+        ctx->digest_size = m->digest_size;
+        ctx->digest_set = 1;
+
+        /* destroy old hmac_ctx if digest changes */
+        if (ctx->hmac_ctx) {
+            stm32_hmac_freectx(ctx->hmac_ctx);
+            ctx->hmac_ctx = NULL;
+        }
+    }
+
+    return 1;
+}
+
+/*********************************************************************
+ *
+ * Dispatch table
+ *
+ *****/
+static const OSSL_DISPATCH mac_functions[] = {
+    { OSSL_FUNC_MAC_NEWCTX,               (void(*)(void))mac_newctx              },
+    { OSSL_FUNC_MAC_FREECTX,              (void(*)(void))mac_freectx             },
+    { OSSL_FUNC_MAC_DUPCTX,               (void(*)(void))mac_dupctx              },
+    { OSSL_FUNC_MAC_INIT,                 (void(*)(void))mac_init                },
+    { OSSL_FUNC_MAC_UPDATE,               (void(*)(void))mac_update              },
+    { OSSL_FUNC_MAC_FINAL,                (void(*)(void))mac_final               },
+    { OSSL_FUNC_MAC_GET_PARAMS,           (void(*)(void))mac_get_params          },
+    { OSSL_FUNC_MAC_GETTABLE_PARAMS,      (void(*)(void))mac_gettable_params     },
+    { OSSL_FUNC_MAC_GET_CTX_PARAMS,       (void(*)(void))mac_get_ctx_params      },
+    { OSSL_FUNC_MAC_GETTABLE_CTX_PARAMS,  (void(*)(void))mac_gettable_ctx_params },
+    { OSSL_FUNC_MAC_SET_CTX_PARAMS,      (void(*)(void))mac_set_ctx_params      },
+    { OSSL_FUNC_MAC_SETTABLE_CTX_PARAMS, (void(*)(void))mac_settable_ctx_params },
+    { 0, NULL }
+};
+
+const OSSL_ALGORITHM stm32_macs[] = {
+    { STM32_NAME_HMAC, STM32_PROV_PROPS, mac_functions,
+      "STM32 HMAC via hardware (afalg/cryptodev)" },
+    { NULL, NULL, NULL, NULL }
+};
