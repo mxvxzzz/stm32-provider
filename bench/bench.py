@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """
-generate_benchmark.py · SHA Benchmark HTML
-#
-#
+bench_tp.py · SHA Benchmark Throughput Pur — HTML
 Usage:
-    python3 bench.py
-    python3 bench.py --input other_name.json --output ma_page.html
+    python3 bench_tp.py
+    python3 bench_tp.py --input other_name.json --output ma_page.html
 """
 
 import argparse
@@ -31,21 +29,21 @@ PROVIDER_NAMES = {
 }
 
 PROVIDER_COLORS = {
-    "afalg":     "#03234B",
+    "afalg":     "#0971F0",
     "cryptodev": "#00A66C",
     "engine":    "#F39C12",
-    "sw":        "#6B7280",
+    "sw":        "#F40000",
 }
 
 ALGOS = ["sha1", "sha256", "sha512"]
 
 PAGE_CHIP     = "STM32MP257 EV1 · OpenSSL 3.2.6 · AArch64 · Cortex-A35"
-PAGE_TITLE    = "SHA Provider Benchmark"
-PAGE_SUBTITLE = "Throughput + impact CPU : Provider AF_ALG · Provider Cryptodev · Legacy Engine Cryptodev · software"
+PAGE_TITLE    = "SHA Benchmark · Throughput Pur"
+PAGE_SUBTITLE = "Provider ST via AF_ALG · Provider ST via Cryptodev · Legacy Engine Cryptodev · OpenSSL software"
 PAGE_FOOTER   = "openssl speed -seconds N -bytes N -elapsed -Implementation"
 
-DEFAULT_INPUT  = "bench_results.json"
-DEFAULT_OUTPUT = "st_sha_benchmark.html"
+DEFAULT_INPUT  = "bench_tp_results.json"
+DEFAULT_OUTPUT = "st_sha_benchmark_tp.html"
 
 # HELPERS
 def fmt_bytes_label(b):
@@ -101,34 +99,12 @@ def build_data(results):
                 cpu[p][algo]["core1"].append(c1)
                 cpu[p][algo]["total"].append(tot)
 
-    # perf[provider][algo]{ipc,cycles} = [...] 
-    has_perf = any(
-        (idx.get((p, b)) or {}).get(algo, {}).get("cycles")
-        for p in providers for b in sizes for algo in ALGOS
-    )
-    perf = None
-    if has_perf:
-        perf = {}
-        for p in providers:
-            perf[p] = {}
-            for algo in ALGOS:
-                perf[p][algo] = {"ipc": [], "cycles": []}
-                for b in sizes:
-                    ad = (idx.get((p, b)) or {}).get(algo) or {}
-                    cy = ad.get("cycles")
-                    ins = ad.get("instructions")
-                    ipc = round(ins / cy, 2) if cy and ins and cy > 0 else None
-                    perf[p][algo]["ipc"].append(ipc)
-                    perf[p][algo]["cycles"].append(cy)
-
     return {
         "sizes":     sizes,
         "labels":    [fmt_bytes_label(b) for b in sizes],
         "providers": providers,
         "data":      data,
         "cpu":       cpu,
-        "perf":      perf,
-        "has_perf":  has_perf,
     }
 
 
@@ -142,7 +118,6 @@ def build_js_vars(d):
     lines.append(f"const names      = {json.dumps({p: PROVIDER_NAMES[p]  for p in providers})};")
     lines.append(f"const colors     = {json.dumps({p: PROVIDER_COLORS[p] for p in providers})};")
     lines.append(f"const algos      = {json.dumps(ALGOS)};")
-    lines.append(f"const hasPerf    = {'true' if d['has_perf'] else 'false'};")
 
     # data[provider][algo] = [...]
     lines.append("const data = {")
@@ -164,21 +139,6 @@ def build_js_vars(d):
             lines.append("    },")
         lines.append("  },")
     lines.append("};")
-
-    # perfData[provider][algo] = {ipc, cycles}
-    if d["perf"]:
-        lines.append("const perfData = {")
-        for p in providers:
-            lines.append(f"  {p}: {{")
-            for algo in ALGOS:
-                lines.append(f"    {algo}: {{")
-                for key in ["ipc", "cycles"]:
-                    lines.append(f"      {key}: {to_js_array(d['perf'][p][algo][key])},")
-                lines.append("    },")
-            lines.append("  },")
-        lines.append("};")
-    else:
-        lines.append("const perfData = null;")
 
     return "\n".join(lines)
 
@@ -346,6 +306,10 @@ def generate_html(results):
   .spark{{height:50px;margin-top:18px;position:relative;z-index:1;}}.spark svg{{width:100%;height:100%;display:block;}}
   .p-footer{{margin:10px -16px -16px;padding:10px 16px;text-align:center;font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px;color:#344054;background:#f7f9fc;position:relative;z-index:1;border-top:1px solid #edf1f5;}}
   footer{{margin:30px 0 8px;text-align:center;color:#667085;font-family:'JetBrains Mono',monospace;font-size:11px;}}
+  .tab-group{{display:flex;gap:4px;}}
+  .tab-btn{{font-family:'JetBrains Mono',monospace;font-size:11px;color:#344054;border:1px solid #ced8e4;background:#fff;border-radius:8px;padding:7px 12px;cursor:pointer;transition:.15s ease;}}
+  .tab-btn:hover{{border-color:var(--st-cyan);background:#f4faff;}}
+  .tab-btn.active{{color:#fff;background:var(--st-blue);border-color:var(--st-blue);}}
 </style>
 </head>
 <body>
@@ -371,10 +335,9 @@ def generate_html(results):
         <div class="termbar"><span class="led"></span><span class="led y"></span><span class="led g"></span></div>
         <div class="term-body">
           <div><span class="prompt">maho@stm32mp257</span>:<span class="cmd">~/bench</span>$ ./bench.sh</div>
-          <div class="comment"># Starting benchmark for:</div>
-          <div class="comment"># Software implementation (OpenSSL)</div>
-          <div class="comment"># ST provider via AF_ALG interface</div>
-          <div class="comment"># ST provider via Cryptodev interface</div>
+          <div class="comment"># Starting benchmark for :</div>
+          <div class="comment"># OpenSSL software</div>
+          <div class="comment"># ST provider via AF_ALG / devcrypto</div>
           <div class="comment"># Legacy Engine (devcrypto)</div>
           <div>&gt; bytes sweep: <span id="termSizes2">—</span></div>
           <div>&gt; run <span class="cursor"></span></div>
@@ -390,11 +353,6 @@ def generate_html(results):
 
   <section class="kpi-grid" id="metrics"></section>
 
-  <section class="providers-panel">
-    <div class="providers-head">Providers Overview <small>(real data)</small></div>
-    <div class="provider-strip" id="providerStrip"></div>
-  </section>
-
   <section class="main-grid">
     <div class="panel race-panel">
       <div class="panel-head"><div><div class="panel-title">Throughput Race</div><div class="panel-sub" id="sub1">—</div></div><div class="panel-tag">KB/s</div></div>
@@ -403,17 +361,6 @@ def generate_html(results):
     <div class="panel">
       <div class="panel-head"><div><div class="panel-title">CPU Pressure Gauges</div><div class="panel-sub" id="subGauge">Core 0 / Core 1</div></div><div class="panel-tag">JSON avg</div></div>
       <div class="gauge-grid" id="gauges"></div>
-    </div>
-  </section>
-
-  <section class="main-grid">
-    <div class="panel">
-      <div class="panel-head"><div><div class="panel-title">Ratio vs Software</div><div class="panel-sub" id="sub2">—</div></div><div class="panel-tag">%</div></div>
-      <div class="chart-box sm"><canvas id="c2"></canvas></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head"><div><div class="panel-title">Core Usage Split</div><div class="panel-sub" id="sub3">—</div></div><div class="panel-tag">dual core</div></div>
-      <div class="chart-box sm"><canvas id="c3"></canvas></div>
     </div>
   </section>
 
@@ -426,16 +373,15 @@ def generate_html(results):
 
   <section class="cpu-wide-grid">
     <div class="panel">
-      <div class="panel-head"><div><div class="panel-title">CPU Evolution · Core 0</div><div class="panel-sub" id="sub5">—</div></div><div class="panel-tag">core 0</div></div>
+      <div class="panel-head">
+        <div><div class="panel-title">CPU Evolution</div><div class="panel-sub" id="sub5">—</div></div>
+        <div class="tab-group">
+          <button class="tab-btn active" id="tabCore0" onclick="selCpuCore='core0';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');buildC5()">Core 0</button>
+          <button class="tab-btn" id="tabCore1" onclick="selCpuCore='core1';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');buildC5()">Core 1</button>
+          <button class="tab-btn" id="tabAvg" onclick="selCpuCore='total';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');buildC5()">Average</button>
+        </div>
+      </div>
       <div class="chart-box lg"><canvas id="c5"></canvas></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head"><div><div class="panel-title">CPU Evolution · Core 1</div><div class="panel-sub" id="sub6">—</div></div><div class="panel-tag">core 1</div></div>
-      <div class="chart-box lg"><canvas id="c6"></canvas></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head"><div><div class="panel-title">CPU Evolution · Average Core 0 / Core 1</div><div class="panel-sub" id="sub7">—</div></div><div class="panel-tag">avg cpu</div></div>
-      <div class="chart-box lg"><canvas id="c7"></canvas></div>
     </div>
   </section>
 
@@ -446,38 +392,25 @@ def generate_html(results):
 {js_vars}
 let selBytes = {default_idx};
 let selAlgo = 1;
+let selCpuCore = 'core0';
 const ALGO_LABELS = {{sha1:'SHA-1', sha256:'SHA-256', sha512:'SHA-512'}};
-let c1,c2,c3,c4,c5,c6,c7;
+const CPU_LABELS = {{core0:'Core 0', core1:'Core 1', total:'Average'}};
+let c1,c4,c5;
 
 function fmtKbs(v){{ if(v===null||v===undefined) return '—'; return v>=1000?(v/1000).toFixed(1)+' MB/s':v.toFixed(0)+' KB/s'; }}
 function fmtPct(v){{ return (v===null||v===undefined)?'—':v.toFixed(1)+'%'; }}
 function alpha(hex,a){{ const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${{r}},${{g}},${{b}},${{a}})`; }}
 function tickStyle(size=11){{ return {{color:'#8aa4b8',font:{{family:'JetBrains Mono',size}}}}; }}
 function gridOpts(){{ return {{color:'rgba(148,163,184,.08)'}}; }}
-function chartBase(){{ return {{responsive:true,maintainAspectRatio:false,animation:{{duration:900,easing:'easeOutQuart'}},plugins:{{legend:{{labels:{{color:'#b8c7d7',font:{{family:'JetBrains Mono',size:11}}}}}},tooltip:{{backgroundColor:'rgba(3,35,75,.96)',borderColor:'rgba(57,169,220,.45)',borderWidth:1,titleColor:'#fff',bodyColor:'#e9f4ff',padding:12}}}}}}; }}
+const _monoFont = {{family:'JetBrains Mono',size:11}};
+function chartBase(){{ return {{responsive:true,maintainAspectRatio:false,animation:{{duration:900,easing:'easeOutQuart'}},plugins:{{legend:{{labels:{{color:'#b8c7d7',font:_monoFont}}}},tooltip:{{backgroundColor:'rgba(3,35,75,.96)',borderColor:'rgba(57,169,220,.45)',borderWidth:1,titleColor:'#fff',bodyColor:'#e9f4ff',padding:12}}}}}}; }}
 
 function getCpu(p,algo,bi,key){{ return cpuData?.[p]?.[algo]?.[key]?.[bi] ?? null; }}
-function getPerf(p,algo,bi,key){{ return perfData?.[p]?.[algo]?.[key]?.[bi] ?? null; }}
 
 function bestProvider(algo,bi){{
   let best=null,val=-Infinity;
   providers.forEach(p=>{{ const v=data[p][algo][bi]||0; if(v>val){{val=v;best=p;}} }});
   return {{provider:best,value:val}};
-}}
-function sparkPath(vals,w=260,h=52){{
-  const clean=vals.map(v=>v||0);
-  const max=Math.max(...clean,1),min=Math.min(...clean),span=Math.max(max-min,1);
-  return clean.map((v,i)=>{{
-    const x=clean.length<=1?0:(i/(clean.length-1))*w;
-    const y=h-((v-min)/span)*(h-8)-4;
-    return `${{i===0?'M':'L'}} ${{x.toFixed(1)}} ${{y.toFixed(1)}}`;
-  }}).join(' ');
-}}
-function providerFooter(p){{
-  if(p==='afalg') return 'Hardware accelerated';
-  if(p==='cryptodev') return 'Cryptodev accelerated';
-  if(p==='engine') return 'Engine accelerated';
-  return 'Software implementation';
 }}
 
 function buildButtons(){{
@@ -485,45 +418,6 @@ function buildButtons(){{
   sizeLabels.forEach((lbl,i)=>{{ const b=document.createElement('button');b.className='btn'+(i===selBytes?' active':'');b.textContent=lbl;b.onclick=()=>{{selBytes=i;document.querySelectorAll('#btnBytes .btn').forEach((x,j)=>x.classList.toggle('active',j===i));update();}};bEl.appendChild(b); }});
   const aEl=document.getElementById('btnAlgo');
   algos.forEach((a,i)=>{{ const b=document.createElement('button');b.className='btn'+(i===selAlgo?' active':'');b.textContent=ALGO_LABELS[a];b.onclick=()=>{{selAlgo=i;document.querySelectorAll('#btnAlgo .btn').forEach((x,j)=>x.classList.toggle('active',j===i));update();}};aEl.appendChild(b); }});
-}}
-
-function buildProviderStrip(){{
-  const algo=algos[selAlgo],bi=selBytes;
-  const swVal=data.sw?data.sw[algo][bi]:null;
-  const best=bestProvider(algo,bi).provider;
-  document.getElementById('providerStrip').innerHTML=providers.map(p=>{{
-    const vals=data[p][algo].map(v=>v||0);
-    const throughput=data[p][algo][bi];
-    const cpuTotal=getCpu(p,algo,bi,'total');
-    const core0=getCpu(p,algo,bi,'core0');
-    const core1=getCpu(p,algo,bi,'core1');
-    const ipc=getPerf(p,algo,bi,'ipc');
-    const ratio=(throughput&&swVal)?(throughput/swVal*100):null;
-    const ratioText=p==='sw'?'—':(ratio===null?'—':(ratio-100>=0?'+':'')+(ratio-100).toFixed(0)+'%');
-    const badge=p===best?'BEST PERFORMANCE':'MEASURED · JSON';
-    const path=sparkPath(vals);
-    const selectedX=vals.length<=1?0:(bi/(vals.length-1))*260;
-    return `<div class="provider-card" style="--pcol:${{colors[p]}}">
-      <div class="provider-top"><div class="p-left"><div class="p-dot"></div><div class="p-name">${{names[p]}}</div></div><div class="p-dot dim"></div></div>
-      <div class="p-badge">${{badge}}</div>
-      <div class="p-value">${{fmtKbs(throughput).replace(' MB/s','<span class="unit">MB/s</span>').replace(' KB/s','<span class="unit">KB/s</span>')}}</div>
-      <div class="p-ratio">${{ratioText}}<small>${{p==='sw'?'baseline':'vs software'}}</small></div>
-      <div class="p-label">Throughput</div>
-      <div class="p-metrics">
-        <div class="p-metric"><span>CPU total (avg)</span><strong>${{fmtPct(cpuTotal)}}</strong></div>
-        <div class="p-metric"><span>Core 0</span><strong>${{fmtPct(core0)}}</strong></div>
-        <div class="p-metric"><span>Core 1</span><strong>${{fmtPct(core1)}}</strong></div>
-      </div>
-      <div class="spark">
-        <svg viewBox="0 0 260 56" preserveAspectRatio="none">
-          <path d="${{path}} L 260 56 L 0 56 Z" fill="${{alpha(colors[p],.18)}}"></path>
-          <path d="${{path}}" fill="none" stroke="${{colors[p]}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-          <line x1="${{selectedX.toFixed(1)}}" y1="0" x2="${{selectedX.toFixed(1)}}" y2="56" stroke="rgba(255,255,255,.25)" stroke-width="1"></line>
-        </svg>
-      </div>
-      <div class="p-footer">${{providerFooter(p)}}</div>
-    </div>`;
-  }}).join('');
 }}
 
 function buildMetrics(){{
@@ -537,8 +431,7 @@ function buildMetrics(){{
   document.getElementById('metrics').innerHTML=ranked.map((p,i)=>{{
     const v=data[p][algo][bi];
     const cpu=getCpu(p,algo,bi,'total');
-    const ipc=getPerf(p,algo,bi,'ipc');
-    return `<div class="kpi" style="--kpi-color:${{colors[p]}}"><div class="kpi-name">${{names[p]}}</div><div class="kpi-main">${{fmtKbs(v)}}</div><div class="kpi-sub">CPU total ${{fmtPct(cpu)}} · IPC ${{ipc??'—'}}</div><div class="rank">#${{i+1}}</div></div>`;
+    return `<div class="kpi" style="--kpi-color:${{colors[p]}}"><div class="kpi-name">${{names[p]}}</div><div class="kpi-main">${{fmtKbs(v)}}</div><div class="kpi-sub">CPU total ${{fmtPct(cpu)}}</div><div class="rank">#${{i+1}}</div></div>`;
   }}).join('');
 }}
 
@@ -570,35 +463,6 @@ function buildC1(){{
   }});
 }}
 
-function buildC2(){{
-  if(c2) c2.destroy();
-  const algo=algos[selAlgo],bi=selBytes,sw=data.sw?data.sw[algo][bi]:null;
-  document.getElementById('sub2').textContent=`${{ALGO_LABELS[algo]}} · baseline default SW = 100%`;
-  const ratios=providers.map(p=>{{const v=data[p][algo][bi];return (v&&sw)?+(v/sw*100).toFixed(1):null;}});
-  c2=new Chart(document.getElementById('c2'),{{
-    type:'bar',
-    data:{{labels:providers.map(p=>names[p]),datasets:[{{label:'vs SW',data:ratios,backgroundColor:providers.map(p=>alpha(colors[p],.52)),borderColor:providers.map(p=>colors[p]),borderWidth:2,borderRadius:12}}]}},
-    options:{{...chartBase(),indexAxis:'y',scales:{{x:{{ticks:{{...tickStyle(),callback:v=>v+'%'}},grid:gridOpts()}},y:{{ticks:tickStyle(),grid:gridOpts()}}}},plugins:{{...chartBase().plugins,legend:{{display:false}},tooltip:{{callbacks:{{label:c=>' '+(c.parsed.x??0).toFixed(1)+'% du software'}}}}}}}}
-  }});
-}}
-
-function buildC3(){{
-  if(c3) c3.destroy();
-  const algo=algos[selAlgo],bi=selBytes;
-  document.getElementById('sub3').textContent=`${{ALGO_LABELS[algo]}} · average CPU usage · ${{sizeLabels[bi]}}`;
-  c3=new Chart(document.getElementById('c3'),{{
-    type:'bar',
-    data:{{
-      labels:providers.map(p=>names[p]),
-      datasets:[
-        {{label:'Core 0',data:providers.map(p=>getCpu(p,algo,bi,'core0')),backgroundColor:providers.map(p=>alpha(colors[p],.78)),borderColor:providers.map(p=>colors[p]),borderWidth:2,borderRadius:10}},
-        {{label:'Core 1',data:providers.map(p=>getCpu(p,algo,bi,'core1')),backgroundColor:providers.map(p=>alpha(colors[p],.25)),borderColor:providers.map(p=>alpha(colors[p],.55)),borderWidth:2,borderRadius:10}}
-      ]
-    }},
-    options:{{...chartBase(),layout:{{padding:{{top:0,bottom:0,left:0,right:0}}}},scales:{{x:{{ticks:tickStyle(),grid:gridOpts()}},y:{{max:100,ticks:{{...tickStyle(),callback:v=>v+'%'}},grid:gridOpts()}}}},plugins:{{...chartBase().plugins,tooltip:{{callbacks:{{label:c=>' '+c.dataset.label+': '+fmtPct(c.parsed.y)}}}}}}}}
-  }});
-}}
-
 function buildC4(){{
   if(c4) c4.destroy();
   const algo=algos[selAlgo];
@@ -613,14 +477,14 @@ function buildC4(){{
 function buildC5(){{
   if(c5) c5.destroy();
   const algo=algos[selAlgo];
-  document.getElementById('sub5').textContent=`${{ALGO_LABELS[algo]}} · Core 0 usage across block sizes`;
+  document.getElementById('sub5').textContent=`${{ALGO_LABELS[algo]}} · ${{CPU_LABELS[selCpuCore]}} usage across block sizes`;
   c5=new Chart(document.getElementById('c5'),{{
     type:'line',
     data:{{
       labels:sizeLabels,
       datasets:providers.map(p=>({{
         label:names[p],
-        data:cpuData[p][algo].core0,
+        data:cpuData[p][algo][selCpuCore],
         borderColor:colors[p],
         backgroundColor:alpha(colors[p],.10),
         fill:true,borderWidth:3,pointRadius:4,pointHoverRadius:7,
@@ -631,49 +495,7 @@ function buildC5(){{
   }});
 }}
 
-function buildC6(){{
-  if(c6) c6.destroy();
-  const algo=algos[selAlgo];
-  document.getElementById('sub6').textContent=`${{ALGO_LABELS[algo]}} · Core 1 usage across block sizes`;
-  c6=new Chart(document.getElementById('c6'),{{
-    type:'line',
-    data:{{
-      labels:sizeLabels,
-      datasets:providers.map(p=>({{
-        label:names[p],
-        data:cpuData[p][algo].core1,
-        borderColor:colors[p],
-        backgroundColor:alpha(colors[p],.10),
-        fill:true,borderWidth:3,pointRadius:4,pointHoverRadius:7,
-        pointBackgroundColor:colors[p],tension:.42,spanGaps:true
-      }}))
-    }},
-    options:{{...chartBase(),interaction:{{mode:'index',intersect:false}},scales:{{x:{{ticks:{{...tickStyle(10),maxRotation:45}},grid:gridOpts()}},y:{{min:0,max:100,ticks:{{...tickStyle(),callback:v=>v+'%'}},grid:gridOpts()}}}},plugins:{{...chartBase().plugins,tooltip:{{callbacks:{{label:c=>' '+c.dataset.label+': '+fmtPct(c.parsed.y)}}}}}}}}
-  }});
-}}
-
-function buildC7(){{
-  if(c7) c7.destroy();
-  const algo=algos[selAlgo];
-  document.getElementById('sub7').textContent=`${{ALGO_LABELS[algo]}} · average CPU = (Core 0 + Core 1) / 2 across block sizes`;
-  c7=new Chart(document.getElementById('c7'),{{
-    type:'line',
-    data:{{
-      labels:sizeLabels,
-      datasets:providers.map(p=>({{
-        label:names[p],
-        data:cpuData[p][algo].total,
-        borderColor:colors[p],
-        backgroundColor:alpha(colors[p],.10),
-        fill:true,borderWidth:3,pointRadius:4,pointHoverRadius:7,
-        pointBackgroundColor:colors[p],tension:.42,spanGaps:true
-      }}))
-    }},
-    options:{{...chartBase(),interaction:{{mode:'index',intersect:false}},scales:{{x:{{ticks:{{...tickStyle(10),maxRotation:45}},grid:gridOpts()}},y:{{min:0,max:100,ticks:{{...tickStyle(),callback:v=>v+'%'}},grid:gridOpts()}}}},plugins:{{...chartBase().plugins,tooltip:{{callbacks:{{label:c=>' '+c.dataset.label+': '+fmtPct(c.parsed.y)}}}}}}}}
-  }});
-}}
-
-function update(){{ buildMetrics(); buildProviderStrip(); buildGauges(); buildC1(); buildC2(); buildC3(); buildC4(); buildC5(); buildC6(); buildC7(); }}
+function update(){{ buildMetrics(); buildGauges(); buildC1(); buildC4(); buildC5(); }}
 
 const canvas=document.getElementById('particle-canvas'),ctx=canvas.getContext('2d');let W,H,particles=[],traces=[],tick=0;
 function makeTrace(){{
@@ -720,7 +542,7 @@ buildButtons();update();
 
 
 def main():
-    ap = argparse.ArgumentParser(description="STM32MP257 — génère la page HTML benchmark")
+    ap = argparse.ArgumentParser(description="STM32MP257 — génère la page HTML benchmark throughput pur")
     ap.add_argument("--input",  default=DEFAULT_INPUT,  help=f"JSON source (défaut: {DEFAULT_INPUT})")
     ap.add_argument("--output", default=DEFAULT_OUTPUT, help=f"HTML de sortie (défaut: {DEFAULT_OUTPUT})")
     args = ap.parse_args()
@@ -732,7 +554,7 @@ def main():
 
     results = json.loads(src.read_text())
     if not results:
-        print("✗ bench_results.json est vide.")
+        print("✗ bench_tp_results.json est vide.")
         sys.exit(1)
 
     html = generate_html(results)
