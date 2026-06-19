@@ -20,12 +20,6 @@ This project uses:
 - `bear` : A command-line tool used to generate `compile_commands.json` for editor integration
 ---
 
-Here is a diagram showing the internal components of the provider:
-
-### Architecture Provider STM32MPU
-
-![Architecture Crypto](./images/stprovider.svg)
-
 ### Internal Workflow
 
 - **Entry Point (`prov.c`):** The main entry point that registers the provider and sets up the OpenSSL dispatch tables for the supported operations (Digests, Ciphers, etc.).
@@ -86,19 +80,42 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
   `export OPENSSL_MODULES=$HOME/your_module_directory`
 
+## Do some crypto operations
+
+### Digest :
+
 - Compute a SHA256 digest with this provider
 
   `openssl dgst -provider stm32_provider -propquery "provider=stm32" -sha256 /file.txt`
 
-- Benchmark using openssl speed of SHA3-512 with this provider
+- Benchmark using openssl speed of SHA3-512 with STM32 provider
 
   `openssl speed -provider stm32_provider -propquery "provider=stm32" -evp sha3-512`
 
-- You can also use options such as `-seconds`, `-elapsed`, and `-bytes` to customize the benchmark. For more details, refer to the `openssl speed` documentation.
+- You can also use options such as `-seconds`, `-elapsed`, and `-bytes` to customize the benchmark. 
 
   `openssl speed -seconds 10 -elapsed -bytes 8192 -provider stm32_provider -propquery "provider=stm32" sha256`
 
+  For more details, refer to the `openssl speed` documentation.
+
+  👉 https://docs.openssl.org/3.1/man1/openssl-speed/
+
+### HMAC
+  
+ - Create the input file :
+
+  `echo "This is a secret message to authenticate." > data.bin`
+
+ - Generate a key :
+
+  `KEY_HEX=$(openssl rand -hex 32)`
+
+ - Compute teh HMAC :
+
+  `openssl mac -digest SHA256 -macopt hexkey:$KEY_HEX -in data.bin -provider stm32_provider -propquery "provider=stm32" HMAC`
+
 ## Benchmark Results on STM32MP25
-You can view the latest performance reports for SHA-1, SHA-256, and SHA-512 here:
+
+You can view the latest performance reports for digest : SHA-1, SHA-256, and SHA-512 here:
 
 👉 [View Benchmark Report](https://mxvxzzz.github.io/bench-digest/)
