@@ -1,8 +1,10 @@
 # STM32MPU Provider
 
-Experimental OpenSSL 3 provider implementing digest algorithms through the Linux AF_ALG and Cryptodev interface. In OpenSSL terms, a provider is a unit of code that offers implementations for operations such as digests, ciphers, signatures, and more.
+In OpenSSL terms, a provider is a unit of code that offers implementations for cryptographic operations such as digests, ciphers, signatures, and more.
 
-Here is a overviweuw of the CryptoAPI architecture, from User space to hardware
+STM32 Provider offloads cryptographic operations for security peripherals embedded in ST MPUs, through the Linux AF_ALG and Cryptodev.
+
+Here is a overviweuw of the CryptoAPI architecture, from User space to hardware :
 
 ## CryptoAPI overview with ST Provider
 
@@ -36,9 +38,9 @@ Here is a diagram showing the internal components of the provider:
 
 - **Hardware Acceleration:** The Linux Crypto API routes these requests directly to the dedicated **STM32 HASH or CRYP Processors** via their respective drivers.
 
-## Supported digests
+## Current algorithm implemented
 
-Currently implemented:
+## Digest :
 
 - SHA-1
 - SHA-224
@@ -48,6 +50,17 @@ Currently implemented:
 - SHA3-256
 - SHA3-384
 - SHA3-512
+
+## HMAC
+
+- HMAC-SHA-1
+- HMAC-SHA-224
+- HMAC-SHA-256
+- HMAC-SHA-384
+- HMAC-SHA-512
+- HMAC-SHA3-256
+- HMAC-SHA3-384
+- HMAC-SHA3-512
 
 ---
 
@@ -85,7 +98,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
   `openssl speed -seconds 10 -elapsed -bytes 8192 -provider stm32_provider -propquery "provider=stm32" sha256`
 
-## Benchmark Results
+## Benchmark Results on STM32MP25
 You can view the latest performance reports for SHA-1, SHA-256, and SHA-512 here:
 
-👉 [View Benchmark Report](https://mxvxzzz.github.io/stm32-provider/bench/index.html)
+👉 [View Benchmark Report](https://mxvxzzz.github.io/bench-digest/)
