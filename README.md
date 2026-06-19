@@ -17,7 +17,6 @@ This project uses:
 - Implementations through `AF_ALG` and `Cryptodev`
 - `libprov` : A helper library used for provider-side error reporting
 - `include/err.h` + `err.c` : Provides provider-specific error handling and reason strings
-- `bear` : A command-line tool used to generate `compile_commands.json` for editor integration
 ---
 
 ### Internal Workflow
