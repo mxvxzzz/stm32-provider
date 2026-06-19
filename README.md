@@ -109,7 +109,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
   `KEY_HEX=$(openssl rand -hex 32)`
 
- - Compute teh HMAC :
+ - Compute the HMAC :
 
   `openssl mac -digest SHA256 -macopt hexkey:$KEY_HEX -in data.bin -provider stm32_provider -propquery "provider=stm32" HMAC`
 
