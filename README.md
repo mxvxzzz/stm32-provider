@@ -24,7 +24,7 @@ This project uses:
 
 - **Entry Point (`prov.c`):** The main entry point that registers the provider and sets up the OpenSSL dispatch tables for the supported operations (Digests, Ciphers, etc.).
 
-- **Operation Layer (`digest/`, `cipher/`):** Implements the standard OpenSSL interfaces (`newctx`, `init`, `update`, `final`) to dispatch algorithms cleanly.
+- **Operation Layer (`digest/`, `cipher/`):** Implements the standard OpenSSL interfaces (`newctx`, `init`, `update`, `final`) to dispatch algorithms.
 
 - **Precompilation Switch:** A build-time configuration flag that selects the targeted Linux kernel API backend.
 
@@ -84,7 +84,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
 ### Digest :
 
-- Compute a SHA256 digest with this provider
+- Compute a SHA256 digest with STM32 provider
 
   `openssl dgst -provider stm32_provider -propquery "provider=stm32" -sha256 /file.txt`
 
