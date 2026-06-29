@@ -30,6 +30,4 @@ int stm32_hmac_update(STM32_HMAC_CTX *ctx,
 int stm32_hmac_final(STM32_HMAC_CTX *ctx,
                         unsigned char *out, size_t *outl);
 
-extern const OSSL_ALGORITHM stm32_macs[];
-
 #endif /* HMAC_H */

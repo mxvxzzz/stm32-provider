@@ -29,12 +29,4 @@ int stm32_hash_init(STM32_HASH_CTX *ctx);
 int stm32_hash_update(STM32_HASH_CTX *ctx, const unsigned char *in, size_t inl);
 int stm32_hash_final(STM32_HASH_CTX *ctx, unsigned char *out, size_t *outl);
 
-/*********************************************************************
- *
- *  Table of digest algorithms 
- *
- *****/
-extern const OSSL_ALGORITHM stm32_digests[];
-
-
 #endif /* DIGEST_H */
