@@ -22,6 +22,8 @@ enum {
   STM32_R_OUTPUT_BUFFER_TOO_SMALL,
   STM32_R_UNSUPPORTED_OPERATION,
   STM32_R_AFALG_FAILED,
+  STM32_R_CIPHER_NEWCTX_FAILED,
+  STM32_R_CIPHER_INIT_FAILED,
 };
 
 /*********************************************************************

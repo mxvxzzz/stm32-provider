@@ -26,9 +26,11 @@ const OSSL_ITEM stm32_reason_strings[] = {
     { STM32_R_INVALID_ARGUMENT,       "invalid argument"        },
     { STM32_R_OUTPUT_BUFFER_TOO_SMALL,"output buffer too small" },
     { STM32_R_UNSUPPORTED_OPERATION,  "unsupported operation"   },
-    {STM32_R_AFALG_FAILED,            "AF_ALG operation failed"},
+    { STM32_R_AFALG_FAILED,           "AF_ALG operation failed" },
     /************** 
      * cipher 
      */
+    { STM32_R_CIPHER_NEWCTX_FAILED,   "cipher newctx failed"    },
+    { STM32_R_CIPHER_INIT_FAILED,     "cipher init failed"      },
     { 0, NULL }
 };

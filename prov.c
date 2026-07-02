@@ -72,7 +72,6 @@ static int prov_get_params(void *provctx, OSSL_PARAM params[])
  *****/
 
 /* query */
-static const OSSL_ALGORITHM * p11prov_query_operation
 static const OSSL_ALGORITHM *prov_query(void *provctx, int operation_id, int *no_cache)
 {
     (void)provctx;
