@@ -92,8 +92,8 @@ static void *cipher_newctx(void *provctx, STM32_CIPHER_MODE mode, size_t keylen,
  */
 static void *cipher_dupctx(void *vctx)
 {
-	STM32_CIPHER_CTX *src = (STM32_CIPHER_CTX_ *)vctx;
-	STM32_CIPHER_CTX *dst;
+	STM32_CIPHER_CTX_ *src = (STM32_CIPHER_CTX_ *)vctx;
+	STM32_CIPHER_CTX_ *dst;
 
 	if (src == NULL)
 		return NULL;
@@ -188,6 +188,7 @@ static int cipher_init(STM32_CIPHER_CTX_ *ctx, const unsigned char *key, size_t 
 	}
 
 	ctx->encrypt = encrypt;
+	ctx->buf_len = 0;
 
 	/* (re)create the hardware session with the current key/IV */
 	if (ctx->hw_ctx != NULL) {
@@ -210,6 +211,8 @@ static int cipher_init(STM32_CIPHER_CTX_ *ctx, const unsigned char *key, size_t 
 		return 0;
 	}
 
+	ctx->initialized = 1;
+
 	return 1;
 }
 
@@ -223,6 +226,48 @@ static int cipher_decrypt_init(void *vctx, const unsigned char *key, size_t keyl
 			const unsigned char *iv, size_t ivlen, const OSSL_PARAM params[])
 {
 	return cipher_init((STM32_CIPHER_CTX_ *)vctx, key, keylen, iv, ivlen, 0, params);
+}
+
+static int cipher_update(void *vctx, unsigned char *out, size_t *outl,
+                         size_t outsize, const unsigned char *in, size_t inl)
+{
+	STM32_CIPHER_CTX_ *ctx = (STM32_CIPHER_CTX_ *)vctx;
+
+	if (!ctx || !ctx->initialized || !outl)
+		return 0;
+
+	*outl = 0;
+
+	if (inl == 0)
+		return 1;
+
+	if (ctx->mode != STM32_CIPHER_MODE_CTR &&
+		(inl % ctx->block_size) != 0) {
+		PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_BLOCK_ALIGNMENT,
+			"inl (%zu) not multiple of block_size (%zu)", inl, ctx->block_size);
+		return 0;
+	}
+
+	if (outsize < inl) {
+		PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
+			"output buffer too small");
+		return 0;
+	}
+
+	return stm32_cipher_update(ctx->hw_ctx, out, outl, in, inl);
+}
+
+static int cipher_final(void *vctx, unsigned char *out, size_t *outl,
+                        size_t outsize)
+{
+	STM32_CIPHER_CTX_ *ctx = (STM32_CIPHER_CTX_ *)vctx;
+
+	if (!ctx || !ctx->initialized || !outl)
+		return 0;
+
+	*outl = 0;
+
+	return stm32_cipher_final(ctx->hw_ctx, out, outl);
 }
 
 /*********************************************************************
@@ -260,15 +305,15 @@ static int cipher_get_params(OSSL_PARAM params[], STM32_CIPHER_MODE mode,
 			 * used in cipher_get_params() to set the mode in OSSL_PARAM
 			 */
 			case STM32_CIPHER_MODE_ECB : 
-				m = EVP_CIPH_ECB_MODE; 
+				m = EVP_CIPH_ECB_MODE;
 				break;
 
 			case STM32_CIPHER_MODE_CBC : 
-				m = EVP_CIPH_CBC_MODE; 
+				m = EVP_CIPH_CBC_MODE;
 				break;
 
 			case STM32_CIPHER_MODE_CTR : 
-				m = EVP_CIPH_CTR_MODE; 
+				m = EVP_CIPH_CTR_MODE;
 				break;
 
 			default : 
@@ -398,10 +443,16 @@ static int cipher_set_ctx_params(void *vctx, const OSSL_PARAM params[])
 			(void (*)(void))name##_newctx },             			\
 		{ OSSL_FUNC_CIPHER_FREECTX, 						\
 			(void (*)(void))cipher_freectx },           			\
+		{ OSSL_FUNC_CIPHER_DUPCTX,              				\
+			(void (*)(void))cipher_dupctx  },				\
 		{ OSSL_FUNC_CIPHER_ENCRYPT_INIT, 					\
 			(void (*)(void))cipher_encrypt_init }, 				\
 		{ OSSL_FUNC_CIPHER_DECRYPT_INIT, 					\
 			(void (*)(void))cipher_decrypt_init }, 				\
+		{ OSSL_FUNC_CIPHER_UPDATE,              				\
+			(void (*)(void))cipher_update      }, 				\
+        	{ OSSL_FUNC_CIPHER_FINAL,               				\
+			(void (*)(void))cipher_final       }, 				\
 		{ OSSL_FUNC_CIPHER_GET_PARAMS, 						\
 			(void (*)(void))name##_get_params }, 				\
 		{ OSSL_FUNC_CIPHER_GETTABLE_PARAMS, 					\
