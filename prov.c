@@ -83,7 +83,7 @@ static const OSSL_ALGORITHM *prov_query(void *provctx, int operation_id, int *no
         case OSSL_OP_MAC :
             return stm32_macs;
         case OSSL_OP_CIPHER : 
-            return stm32_cipher;
+            return stm32_ciphers;
         default :
             break;
     }

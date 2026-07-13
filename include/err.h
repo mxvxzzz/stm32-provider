@@ -10,7 +10,7 @@
 /*********************************************************************
  *
  *  Error reason codes for the STM32 provider
- *
+ *STM32_R_CIPHER_PADDING_INVALID
  *****/
 enum {
   STM32_R_INIT_FAILED = 1,
@@ -24,6 +24,10 @@ enum {
   STM32_R_AFALG_FAILED,
   STM32_R_CIPHER_NEWCTX_FAILED,
   STM32_R_CIPHER_INIT_FAILED,
+  STM32_R_CIPHER_UPDATE_FAILED,
+  STM32_R_CIPHER_BLOCK_ALIGNMENT,
+  STM32_R_CIPHER_FINAL_FAILED,
+  STM32_R_CIPHER_PADDING_INVALID,
 };
 
 /*********************************************************************
