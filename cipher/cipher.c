@@ -51,8 +51,11 @@ struct stm32_cipher_ctx_st {
 	const char *hw_alg_name; /* "stm32-cbc-aes" for af_alg (name exposed by the driver stm32 (kernel)) */
 	int encrypt;
 	int pad_enabled;
+	int initialized;
 	unsigned char key[32];
 	unsigned char iv[16];
+	unsigned char buf[16]; /* buffer for partial blocks */
+	size_t buf_len;
 };
 
 static void *cipher_newctx(void *provctx, STM32_CIPHER_MODE mode, size_t keylen,
@@ -78,9 +81,61 @@ static void *cipher_newctx(void *provctx, STM32_CIPHER_MODE mode, size_t keylen,
 	ctx->block_size = block_size;
 	ctx->hw_alg_name = hw_alg_name;
 	ctx->pad_enabled = (mode == STM32_CIPHER_MODE_CTR) ? 0 : 1;
+	ctx->initialized = 0;
+	ctx->buf_len = 0;
 
 	return ctx;
 }
+
+/* Create a new cipher context for hw_ctx 
+ * initialize the cipher context with the key and iv
+ */
+static void *cipher_dupctx(void *vctx)
+{
+	STM32_CIPHER_CTX *src = (STM32_CIPHER_CTX_ *)vctx;
+	STM32_CIPHER_CTX *dst;
+
+	if (src == NULL)
+		return NULL;
+
+	dst = OPENSSL_zalloc(sizeof(*dst));
+	if (dst == NULL)
+		return NULL;
+
+	dst->provctx = src->provctx;
+	dst->hw_ctx = src->hw_ctx;
+	dst->mode = src->mode;
+	dst->keylen = src->keylen;
+	dst->ivlen = src->ivlen;
+	dst->block_size = src->block_size;
+	dst->hw_alg_name = src->hw_alg_name;
+	dst->encrypt = src->encrypt;
+	dst->pad_enabled = src->pad_enabled;
+	dst->initialized = src->initialized;
+
+	memcpy(dst->key, src->key, sizeof(dst->key));
+	memcpy(dst->iv, src->iv, sizeof(dst->iv));
+	memcpy(dst->buf, src->buf, sizeof(dst->buf));
+
+	dst->buf_len = src->buf_len;
+
+	if (src->initialized) {
+		dst->hw_ctx = stm32_cipher_newctx(dst->provctx, dst->hw_alg_name, dst->mode, dst->keylen);
+
+		if(dst->hw_ctx == NULL) {
+			OPENSSL_free(dst);
+			return NULL;
+		}
+
+		if ( stm32_cipher_init(dst->hw_ctx, dst->key, dst->keylen, dst->iv, dst->ivlen, dst->encrypt) == 0){
+			stm32_cipher_freectx(dst->hw_ctx);
+			OPENSSL_free(dst);
+			return NULL;
+		}
+	}
+	
+	return dst;
+} 
 
 static void cipher_freectx(void *vctx)
 {
@@ -105,7 +160,7 @@ static void cipher_freectx(void *vctx)
 static int cipher_init(STM32_CIPHER_CTX_ *ctx, const unsigned char *key, size_t keylen,
 		const unsigned char *iv, size_t ivlen, int encrypt, const OSSL_PARAM params[]) 
 {
-	PROV_CTX *pctx = (PROV_CTX *)ctx;
+	PROV_CTX *pctx = (PROV_CTX *)ctx->provctx;
 
 	if (pctx == NULL)
 		return 0;
