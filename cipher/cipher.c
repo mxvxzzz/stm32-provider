@@ -26,6 +26,18 @@ static int cipher_encrypt_init(void *vctx, const unsigned char *key, size_t keyl
 static int cipher_decrypt_init(void *vctx, const unsigned char *key, size_t keylen,
 				const unsigned char *iv, size_t ivlen, const OSSL_PARAM params[]);
 
+/* helpers internes update */
+static int cipher_update_encrypt(STM32_CIPHER_CTX_ *ctx, unsigned char *out, size_t *outl,
+                                 const unsigned char *in, size_t inl);
+static int cipher_update_decrypt(STM32_CIPHER_CTX_ *ctx, unsigned char *out, size_t *outl,
+                                 const unsigned char *in, size_t inl);
+
+static int   cipher_update(void *vctx, unsigned char *out, size_t *outl, size_t outsize,
+			   const unsigned char *in, size_t inl);
+
+static int   cipher_final(void *vctx, unsigned char *out, size_t *outl,
+                          size_t outsize);			
+
 static int cipher_get_params(OSSL_PARAM params[], STM32_CIPHER_MODE mode, size_t keylen, 
 			size_t ivlen, size_t block_size);
 
@@ -87,6 +99,21 @@ static void *cipher_newctx(void *provctx, STM32_CIPHER_MODE mode, size_t keylen,
 	return ctx;
 }
 
+static void cipher_freectx(void *vctx)
+{
+	STM32_CIPHER_CTX_ *ctx = (STM32_CIPHER_CTX_ *)vctx;
+
+	if (ctx == NULL)
+		return;
+
+	if (ctx->hw_ctx != NULL)
+		stm32_cipher_freectx(ctx->hw_ctx);
+
+	OPENSSL_cleanse(ctx->key, sizeof(ctx->key));
+	OPENSSL_cleanse(ctx->iv, sizeof(ctx->iv));
+	OPENSSL_free(ctx);
+}
+
 /* Create a new cipher context for hw_ctx 
  * initialize the cipher context with the key and iv
  */
@@ -122,35 +149,18 @@ static void *cipher_dupctx(void *vctx)
 	if (src->initialized) {
 		dst->hw_ctx = stm32_cipher_newctx(dst->provctx, dst->hw_alg_name, dst->mode, dst->keylen);
 
-		if(dst->hw_ctx == NULL) {
-			OPENSSL_free(dst);
-			return NULL;
-		}
+		if(dst->hw_ctx == NULL)
+			goto err;
 
-		if ( stm32_cipher_init(dst->hw_ctx, dst->key, dst->keylen, dst->iv, dst->ivlen, dst->encrypt) == 0){
-			stm32_cipher_freectx(dst->hw_ctx);
-			OPENSSL_free(dst);
-			return NULL;
-		}
+		if ( !stm32_cipher_init(dst->hw_ctx, dst->key, dst->keylen, dst->iv, dst->ivlen, dst->encrypt))
+			goto err;
 	}
 	
 	return dst;
+err:
+    cipher_freectx(dst);
+    return NULL;	
 } 
-
-static void cipher_freectx(void *vctx)
-{
-	STM32_CIPHER_CTX_ *ctx = (STM32_CIPHER_CTX_ *)vctx;
-
-	if (ctx == NULL)
-		return;
-
-	if (ctx->hw_ctx != NULL)
-		stm32_cipher_freectx(ctx->hw_ctx);
-
-	OPENSSL_cleanse(ctx->key, sizeof(ctx->key));
-	OPENSSL_cleanse(ctx->iv, sizeof(ctx->iv));
-	OPENSSL_free(ctx);
-}
 
 /*********************************************************************
 *
@@ -228,46 +238,285 @@ static int cipher_decrypt_init(void *vctx, const unsigned char *key, size_t keyl
 	return cipher_init((STM32_CIPHER_CTX_ *)vctx, key, keylen, iv, ivlen, 0, params);
 }
 
+/*********************************************************************
+ *
+ *  Helpers
+ *
+ *****/
+static int send_to_hw(STM32_CIPHER_CTX_ *ctx,
+                      unsigned char *out, size_t *outl,
+                      const unsigned char *in, size_t len)
+{
+    size_t wrote = 0;
+
+    if (!stm32_cipher_update(ctx->hw_ctx, out + *outl, &wrote, in, len)) {
+        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_UPDATE_FAILED,
+                  "hardware cipher update failed");
+        return 0;
+    }
+    *outl += wrote;
+    return 1;
+}
+
+static int cipher_update_encrypt(STM32_CIPHER_CTX_ *ctx,
+                                 unsigned char *out, size_t *outl,
+                                 const unsigned char *in, size_t inl)
+{
+    size_t bs      = ctx->block_size;
+    size_t in_off  = 0;   
+
+    if (ctx->buf_len > 0) {
+        size_t need = bs - ctx->buf_len;
+        size_t take = (inl < need) ? inl : need;
+
+        memcpy(ctx->buf + ctx->buf_len, in, take);
+        ctx->buf_len += take;
+        in_off       += take;
+
+        if (ctx->buf_len < bs)  
+            return 1;         
+
+        if (!send_to_hw(ctx, out, outl, ctx->buf, bs))
+            return 0;
+        ctx->buf_len = 0;
+    }
+
+    {
+        size_t remaining  = inl - in_off;
+        size_t full_bytes = (remaining / bs) * bs;
+
+        if (full_bytes > 0) {
+            if (!send_to_hw(ctx, out, outl, in + in_off, full_bytes))
+                return 0;
+            in_off += full_bytes;
+        }
+    }
+
+    {
+        size_t tail = inl - in_off;
+        if (tail > 0) {
+            memcpy(ctx->buf, in + in_off, tail);
+            ctx->buf_len = tail;
+        }
+    }
+
+    return 1;
+}
+
+static int cipher_update_decrypt(STM32_CIPHER_CTX_ *ctx,
+                                 unsigned char *out, size_t *outl,
+                                 const unsigned char *in, size_t inl)
+{
+    size_t bs = ctx->block_size;
+
+    if (inl % bs != 0) {
+        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_BLOCK_ALIGNMENT,
+                  "ciphertext length (%zu) not a multiple of block size (%zu)",
+                  inl, bs);
+        return 0;
+    }
+
+    if (inl == 0)
+        return 1;
+
+    if (ctx->buf_len == bs) {
+        if (!send_to_hw(ctx, out, outl, ctx->buf, bs))
+            return 0;
+        ctx->buf_len = 0;
+    }
+
+    {
+        size_t to_send = inl - bs;
+        if (to_send > 0) {
+            if (!send_to_hw(ctx, out, outl, in, to_send))
+                return 0;
+        }
+    }
+
+    memcpy(ctx->buf, in + (inl - bs), bs);
+    ctx->buf_len = bs;
+
+    return 1;
+}
+
+/*********************************************************************
+ *
+ *  Update
+ *
+ *****/
 static int cipher_update(void *vctx, unsigned char *out, size_t *outl,
                          size_t outsize, const unsigned char *in, size_t inl)
 {
-	STM32_CIPHER_CTX_ *ctx = (STM32_CIPHER_CTX_ *)vctx;
+    STM32_CIPHER_CTX_ *ctx = (STM32_CIPHER_CTX_ *)vctx;
 
-	if (!ctx || !ctx->initialized || !outl)
-		return 0;
+    if (ctx == NULL || !ctx->initialized) {
+        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_UPDATE_FAILED,
+                  "cipher not initialized");
+        return 0;
+    }
+    if (outl == NULL) {
+        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
+                  "outl is NULL");
+        return 0;
+    }
 
-	*outl = 0;
+    *outl = 0;
 
-	if (inl == 0)
-		return 1;
+    if (inl == 0)
+        return 1;
 
-	if (ctx->mode != STM32_CIPHER_MODE_CTR &&
-		(inl % ctx->block_size) != 0) {
-		PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_BLOCK_ALIGNMENT,
-			"inl (%zu) not multiple of block_size (%zu)", inl, ctx->block_size);
-		return 0;
-	}
+    if (ctx->mode == STM32_CIPHER_MODE_CTR) {
+        if (outsize < inl) {
+            PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
+                      "output buffer too small");
+            return 0;
+        }
+        return stm32_cipher_update(ctx->hw_ctx, out, outl, in, inl);
+    }
 
-	if (outsize < inl) {
-		PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
-			"output buffer too small");
-		return 0;
-	}
+    if (!ctx->pad_enabled) {
+        if (inl % ctx->block_size != 0) {
+            PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_BLOCK_ALIGNMENT,
+                      "data not aligned and padding is disabled");
+            return 0;
+        }
+        if (outsize < inl) {
+            PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
+                      "output buffer too small");
+            return 0;
+        }
+        return stm32_cipher_update(ctx->hw_ctx, out, outl, in, inl);
+    }
 
-	return stm32_cipher_update(ctx->hw_ctx, out, outl, in, inl);
+    if (outsize < ((ctx->buf_len + inl) / ctx->block_size) * ctx->block_size) {
+        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
+                  "output buffer too small");
+        return 0;
+    }
+
+    if (ctx->encrypt)
+        return cipher_update_encrypt(ctx, out, outl, in, inl);
+    else
+        return cipher_update_decrypt(ctx, out, outl, in, inl);
 }
 
 static int cipher_final(void *vctx, unsigned char *out, size_t *outl,
                         size_t outsize)
 {
-	STM32_CIPHER_CTX_ *ctx = (STM32_CIPHER_CTX_ *)vctx;
+    STM32_CIPHER_CTX_ *ctx       = (STM32_CIPHER_CTX_ *)vctx;
+    PROV_CTX          *pctx;
+    size_t             bs;
+    unsigned char      last_block[16];
+    unsigned char      pad_byte;
+    size_t             plain_len;
+    size_t             wrote;
+    size_t             extra;
+    size_t             i;
 
-	if (!ctx || !ctx->initialized || !outl)
-		return 0;
+    if (ctx == NULL || !ctx->initialized) {
+        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_FINAL_FAILED,
+                  "cipher not initialized");
+        return 0;
+    }
+    if (outl == NULL) {
+        PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
+                  "outl is NULL");
+        return 0;
+    }
 
-	*outl = 0;
+    pctx  = (PROV_CTX *)ctx->provctx;
+    bs    = ctx->block_size;
+    *outl = 0;
+    wrote = 0;
+    extra = 0;
 
-	return stm32_cipher_final(ctx->hw_ctx, out, outl);
+    if (ctx->mode == STM32_CIPHER_MODE_CTR || !ctx->pad_enabled)
+        return stm32_cipher_final(ctx->hw_ctx, out, outl);
+
+    if (ctx->encrypt) {
+
+        if (outsize < bs) {
+            PUT_ERROR(pctx, STM32_R_INVALID_ARGUMENT,
+                      "output buffer too small for final padded block");
+            return 0;
+        }
+
+        pad_byte = (unsigned char)(bs - ctx->buf_len);
+
+        memcpy(last_block, ctx->buf, ctx->buf_len);
+        memset(last_block + ctx->buf_len, pad_byte, pad_byte);
+        ctx->buf_len = 0;
+
+        if (!stm32_cipher_update(ctx->hw_ctx, out, &wrote, last_block, bs)) {
+            PUT_ERROR(pctx, STM32_R_CIPHER_FINAL_FAILED,
+                      "hardware update failed on final padded block");
+            return 0;
+        }
+
+        if (!stm32_cipher_final(ctx->hw_ctx, out + wrote, &extra)) {
+            PUT_ERROR(pctx, STM32_R_CIPHER_FINAL_FAILED,
+                      "hardware final failed");
+            return 0;
+        }
+
+        *outl = wrote + extra;
+        return 1;
+    }
+
+    if (ctx->buf_len != bs) {
+        PUT_ERROR(pctx, STM32_R_CIPHER_BLOCK_ALIGNMENT,
+                  "final block size wrong (%zu expected %zu) — "
+                  "ciphertext truncated or not block-aligned",
+                  ctx->buf_len, bs);
+        return 0;
+    }
+
+    if (!stm32_cipher_update(ctx->hw_ctx, last_block, &wrote, ctx->buf, bs)) {
+        PUT_ERROR(pctx, STM32_R_CIPHER_FINAL_FAILED,
+                  "hardware update failed on final block");
+        return 0;
+    }
+    ctx->buf_len = 0;
+
+    pad_byte = last_block[bs - 1];
+
+    if (pad_byte == 0 || pad_byte > bs) {
+        PUT_ERROR(pctx, STM32_R_CIPHER_PADDING_INVALID,
+                  "invalid PKCS7 pad byte value: 0x%02x", pad_byte);
+        OPENSSL_cleanse(last_block, sizeof(last_block));
+        return 0;
+    }
+
+    for (i = bs - pad_byte; i < bs; i++) {
+        if (last_block[i] != pad_byte) {
+            PUT_ERROR(pctx, STM32_R_CIPHER_PADDING_INVALID,
+                      "invalid PKCS7 padding content at byte %zu", i);
+            OPENSSL_cleanse(last_block, sizeof(last_block));
+            return 0;
+        }
+    }
+
+    plain_len = bs - pad_byte;
+
+    if (outsize < plain_len) {
+        PUT_ERROR(pctx, STM32_R_INVALID_ARGUMENT,
+                  "output buffer too small for unpadded final block");
+        OPENSSL_cleanse(last_block, sizeof(last_block));
+        return 0;
+    }
+
+    memcpy(out, last_block, plain_len);
+    *outl = plain_len;
+
+    OPENSSL_cleanse(last_block, sizeof(last_block));
+
+    if (!stm32_cipher_final(ctx->hw_ctx, out + *outl, &extra)) {
+        PUT_ERROR(pctx, STM32_R_CIPHER_FINAL_FAILED,
+                  "hardware final failed");
+        return 0;
+    }
+    *outl += extra;
+    return 1;
 }
 
 /*********************************************************************
@@ -301,7 +550,7 @@ static int cipher_get_params(OSSL_PARAM params[], STM32_CIPHER_MODE mode,
 			 * /local/home/tabkioum/openssl/providers/implementations/ciphers/ciphercommon.c
 			 *
 			 * Macro in : /local/home/tabkioum/openssl/include/openssl/evp.h
-			 * a temporary fix of the cipher mode (EVP_CIPH_*) 
+			 * cipher mode (EVP_CIPH_*) 
 			 * used in cipher_get_params() to set the mode in OSSL_PARAM
 			 */
 			case STM32_CIPHER_MODE_ECB : 
