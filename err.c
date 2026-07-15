@@ -32,5 +32,8 @@ const OSSL_ITEM stm32_reason_strings[] = {
      */
     { STM32_R_CIPHER_NEWCTX_FAILED,   "cipher newctx failed"    },
     { STM32_R_CIPHER_INIT_FAILED,     "cipher init failed"      },
+    { STM32_R_CIPHER_BLOCK_ALIGNMENT, "cipher block alignement" },
+    { STM32_R_CIPHER_FINAL_FAILED,    "cipher final failed"     },
+    { STM32_R_CIPHER_PADDING_INVALID, "cipher padding invelid"  },
     { 0, NULL }
 };

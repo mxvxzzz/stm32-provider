@@ -33,18 +33,18 @@ static int  afalg_recv(PROV_CTX *pctx, int op_fd,
  *****/
 struct __stm32_cipher_hw_ctx_st__ {
     PROV_CTX          *provctx;
-    int                tf_fd;       
-    int                op_fd;      
+    int                tf_fd;
+    int                op_fd;
     STM32_CIPHER_MODE  mode;
     size_t             ivlen;
-    int                first_send;  
+    int                first_send;
     int                encrypt;
     unsigned char      iv[16];
 };
 
 /*********************************************************************
  *
- *  Helpers 
+ *  Helpers
  *
  *****/
 static void afalg_close_fd(int *fd)
@@ -114,6 +114,7 @@ static int afalg_send_first(PROV_CTX *pctx, int op_fd,
     struct iovec    iov;
     struct cmsghdr *cmsg;
     struct af_alg_iv *alg_iv;
+    int has_iv = (iv != NULL && ivlen > 0);
 
     char cbuf[CMSG_SPACE(sizeof(__u32)) +
               CMSG_SPACE(sizeof(struct af_alg_iv) + 16)];
@@ -126,7 +127,13 @@ static int afalg_send_first(PROV_CTX *pctx, int op_fd,
     msg.msg_iov        = &iov;
     msg.msg_iovlen     = 1;
     msg.msg_control    = cbuf;
-    msg.msg_controllen = sizeof(cbuf);
+
+    /* cmsg 1 */
+    if (has_iv)
+        msg.msg_controllen = CMSG_SPACE(sizeof(__u32)) +
+                             CMSG_SPACE(sizeof(struct af_alg_iv) + ivlen);
+    else
+        msg.msg_controllen = CMSG_SPACE(sizeof(__u32));
 
     cmsg             = CMSG_FIRSTHDR(&msg);
     cmsg->cmsg_level = SOL_ALG;
@@ -134,14 +141,16 @@ static int afalg_send_first(PROV_CTX *pctx, int op_fd,
     cmsg->cmsg_len   = CMSG_LEN(sizeof(__u32));
     *((__u32 *)CMSG_DATA(cmsg)) = encrypt ? ALG_OP_ENCRYPT : ALG_OP_DECRYPT;
 
-    cmsg             = CMSG_NXTHDR(&msg, cmsg);
-    cmsg->cmsg_level = SOL_ALG;
-    cmsg->cmsg_type  = ALG_SET_IV;
-    cmsg->cmsg_len   = CMSG_LEN(sizeof(struct af_alg_iv) + ivlen);
-    alg_iv           = (struct af_alg_iv *)CMSG_DATA(cmsg);
-    alg_iv->ivlen    = (unsigned int)ivlen;
-    if (iv != NULL && ivlen > 0)
-        memcpy(alg_iv->iv, iv, ivlen);
+    /* cmsg 2 : IV */
+    if (has_iv) {
+	cmsg             = CMSG_NXTHDR(&msg, cmsg);
+	cmsg->cmsg_level = SOL_ALG;
+	cmsg->cmsg_type  = ALG_SET_IV;
+	cmsg->cmsg_len   = CMSG_LEN(sizeof(struct af_alg_iv) + ivlen);
+	alg_iv           = (struct af_alg_iv *)CMSG_DATA(cmsg);
+	alg_iv->ivlen    = (unsigned int)ivlen;
+	memcpy(alg_iv->iv, iv, ivlen);
+    }
 
     if (sendmsg(op_fd, &msg, more ? MSG_MORE : 0) < 0) {
         PUT_ERROR_ERRNO(pctx, STM32_R_CIPHER_UPDATE_FAILED,
