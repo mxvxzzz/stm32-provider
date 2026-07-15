@@ -11,11 +11,16 @@
 #include "../include/prov.h"
 #include "../include/err.h"
 
+static void cdev_close_session(STM32_CIPHER_HW_CTX *ctx);
+static int cdev_open_session(STM32_CIPHER_HW_CTX *ctx);
+static void ctr_increment_iv(unsigned char iv[16], size_t bytes_processed);
 typedef struct {
     STM32_CIPHER_MODE mode;
     size_t            keylen;
     unsigned int      cryptodev_id;
 } CIPHER_MAP;
+
+static unsigned int cipher_map_lookup(STM32_CIPHER_MODE mode, size_t keylen);
 
 static const CIPHER_MAP cipher_map[] = {
     { STM32_CIPHER_MODE_ECB, 16, CRYPTO_AES_ECB },
@@ -88,6 +93,21 @@ static int cdev_open_session(STM32_CIPHER_HW_CTX *ctx)
 
     ctx->session_open = 1;
     return 1;
+}
+
+static void ctr_increment_iv(unsigned char iv[16], size_t bytes_processed)
+{
+    size_t  blocks = bytes_processed / 16;
+    int     i;
+    unsigned int carry;
+
+    /* Add 'blocks' to the 128-bit big-endian counter */
+    carry = (unsigned int)blocks;
+    for (i = 15; i >= 0 && carry != 0; i--) {
+        carry += iv[i];
+        iv[i]  = (unsigned char)(carry & 0xFF);
+        carry >>= 8;
+    }
 }
 
 /*********************************************************************
@@ -213,12 +233,20 @@ int stm32_cipher_update(STM32_CIPHER_HW_CTX *ctx,
         return 0;
     }
 
+    /* IV chaining for the future call */
     if (ctx->mode == STM32_CIPHER_MODE_CBC && inl >= 16) {
         if (ctx->encrypt)
             memcpy(ctx->iv, out + inl - 16, 16);
         else
             memcpy(ctx->iv, saved_iv, 16);
     }
+
+   /* Fix CTR: Cryptodev restarts from the initial counter
+      on each CIOCCRYPT call. as solution is to manually
+      increment the counter after each ioctl call.
+    */
+    if (ctx->mode == STM32_CIPHER_MODE_CTR)
+        ctr_increment_iv(ctx->iv, inl);
 
     *outl = inl;
     return 1;
