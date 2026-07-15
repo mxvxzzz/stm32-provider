@@ -227,6 +227,14 @@ done
 
 echo "=== CIPHER TEST END ==="
 echo "TOTAL: $TOTAL  |  PASS: $PASS  |  FAIL: $FAIL"
+
+# restaure printk
+if [ -n "${OLD_PRINTK:-}" ] && [ -w /proc/sys/kernel/printk ]; then
+    echo "$OLD_PRINTK" > /proc/sys/kernel/printk
+fi
+
+rm -rf "$OUTDIR"
+
 if [ "$FAIL" -eq 0 ]; then
     echo "RESULT: ALL PASS"
     exit 0
@@ -235,9 +243,3 @@ else
     exit 1
 fi
 
-# restaure printk
-if [ -n "${OLD_PRINTK:-}" ] && [ -w /proc/sys/kernel/printk ]; then
-    echo "$OLD_PRINTK" > /proc/sys/kernel/printk
-fi
-
-rm -rf "$OUTDIR"
