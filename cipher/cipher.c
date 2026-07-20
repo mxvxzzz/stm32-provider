@@ -374,26 +374,17 @@ static int cipher_update(void *vctx, unsigned char *out, size_t *outl,
         return stm32_cipher_update(ctx->hw_ctx, out, outl, in, inl);
     }
 
-    if (!ctx->pad_enabled) {
-        if (inl % ctx->block_size != 0) {
-            PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_BLOCK_ALIGNMENT,
-                      "data not aligned and padding is disabled");
-            return 0;
-        }
-        if (outsize < inl) {
-            PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
-                      "output buffer too small");
-            return 0;
-        }
-        return stm32_cipher_update(ctx->hw_ctx, out, outl, in, inl);
-    }
-
     if (outsize < ((ctx->buf_len + inl) / ctx->block_size) * ctx->block_size) {
         PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
                   "output buffer too small");
         return 0;
     }
 
+    /* ECB/CBC padding disabled */
+    if (!ctx->pad_enabled) {
+        return stm32_cipher_update(ctx->hw_ctx, out, outl, in, inl);
+    }
+        
     if (ctx->encrypt)
         return cipher_update_encrypt(ctx, out, outl, in, inl);
     else
@@ -430,8 +421,18 @@ static int cipher_final(void *vctx, unsigned char *out, size_t *outl,
     wrote = 0;
     extra = 0;
 
-    if (ctx->mode == STM32_CIPHER_MODE_CTR || !ctx->pad_enabled)
+    if (ctx->mode == STM32_CIPHER_MODE_CTR)
         return stm32_cipher_final(ctx->hw_ctx, out, outl);
+
+    if (!ctx->pad_enabled) {
+	if (ctx->buf_len != 0) {
+            PUT_ERROR(pctx, STM32_R_CIPHER_BLOCK_ALIGNMENT,
+                      "data not multiple of block length (%zu bytes remaining)",
+                      ctx->buf_len);
+            return 0;
+        }
+	return stm32_cipher_final(ctx->hw_ctx, out, outl);
+    }
 
     if (ctx->encrypt) {
 
