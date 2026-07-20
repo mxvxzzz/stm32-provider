@@ -382,9 +382,9 @@ static int cipher_update(void *vctx, unsigned char *out, size_t *outl,
 
     /* ECB/CBC padding disabled */
     if (!ctx->pad_enabled) {
-        return stm32_cipher_update(ctx->hw_ctx, out, outl, in, inl);
+        return cipher_update_encrypt(ctx, out, outl, in, inl);
     }
-        
+
     if (ctx->encrypt)
         return cipher_update_encrypt(ctx, out, outl, in, inl);
     else
@@ -425,13 +425,13 @@ static int cipher_final(void *vctx, unsigned char *out, size_t *outl,
         return stm32_cipher_final(ctx->hw_ctx, out, outl);
 
     if (!ctx->pad_enabled) {
-	if (ctx->buf_len != 0) {
+        if (ctx->buf_len != 0) {
             PUT_ERROR(pctx, STM32_R_CIPHER_BLOCK_ALIGNMENT,
                       "data not multiple of block length (%zu bytes remaining)",
                       ctx->buf_len);
             return 0;
         }
-	return stm32_cipher_final(ctx->hw_ctx, out, outl);
+        return stm32_cipher_final(ctx->hw_ctx, out, outl);
     }
 
     if (ctx->encrypt) {
