@@ -60,7 +60,7 @@ struct stm32_cipher_ctx_st {
 	size_t keylen;
 	size_t ivlen;
 	size_t block_size;
-	const char *hw_alg_name; /* "stm32-cbc-aes" for af_alg (name exposed by the driver stm32 (kernel)) */
+	const char *hw_alg_name;
 	int encrypt;
 	int pad_enabled;
 	int initialized;
@@ -434,8 +434,8 @@ static int cipher_final(void *vctx, unsigned char *out, size_t *outl,
         return stm32_cipher_final(ctx->hw_ctx, out, outl);
     }
 
+    /* Encrypt + padding PKCS7 */
     if (ctx->encrypt) {
-
         if (outsize < bs) {
             PUT_ERROR(pctx, STM32_R_INVALID_ARGUMENT,
                       "output buffer too small for final padded block");
@@ -464,10 +464,10 @@ static int cipher_final(void *vctx, unsigned char *out, size_t *outl,
         return 1;
     }
 
+    /* DECRYPT + padding : remove bytes of last block (PKCS7) */
     if (ctx->buf_len != bs) {
         PUT_ERROR(pctx, STM32_R_CIPHER_BLOCK_ALIGNMENT,
-                  "final block size wrong (%zu expected %zu) — "
-                  "ciphertext truncated or not block-aligned",
+                  "final block size wrong (%zu expected %zu)\n",
                   ctx->buf_len, bs);
         return 0;
     }
@@ -720,17 +720,17 @@ static int cipher_set_ctx_params(void *vctx, const OSSL_PARAM params[])
 
 /* Define the cipher functions for each algorithm supported */
 /* AES-ECB (ivlen=0) */
-DEFINE_CIPHER(aes128ecb, STM32_CIPHER_MODE_ECB, 128, 16, 0, 16, "stm32-ecb-aes");
-DEFINE_CIPHER(aes192ecb, STM32_CIPHER_MODE_ECB, 192, 24, 0, 16, "stm32-ecb-aes");
-DEFINE_CIPHER(aes256ecb, STM32_CIPHER_MODE_ECB, 256, 32, 0, 16, "stm32-ecb-aes");
+DEFINE_CIPHER(aes128ecb, STM32_CIPHER_MODE_ECB, 128, 16, 0, 16, "ecb(aes)");
+DEFINE_CIPHER(aes192ecb, STM32_CIPHER_MODE_ECB, 192, 24, 0, 16, "ecb(aes)");
+DEFINE_CIPHER(aes256ecb, STM32_CIPHER_MODE_ECB, 256, 32, 0, 16, "ecb(aes)");
 /* AES-CBC : IV 16 bytes */
-DEFINE_CIPHER(aes128cbc, STM32_CIPHER_MODE_CBC, 128, 16, 16, 16, "stm32-cbc-aes");
-DEFINE_CIPHER(aes192cbc, STM32_CIPHER_MODE_CBC, 192, 24, 16, 16, "stm32-cbc-aes");
-DEFINE_CIPHER(aes256cbc, STM32_CIPHER_MODE_CBC, 256, 32, 16, 16, "stm32-cbc-aes");
+DEFINE_CIPHER(aes128cbc, STM32_CIPHER_MODE_CBC, 128, 16, 16, 16, "cbc(aes)");
+DEFINE_CIPHER(aes192cbc, STM32_CIPHER_MODE_CBC, 192, 24, 16, 16, "cbc(aes)");
+DEFINE_CIPHER(aes256cbc, STM32_CIPHER_MODE_CBC, 256, 32, 16, 16, "cbc(aes)");
 /* AES-CTR : IV/nonce 16 bytes, block_size = 1 (stream) */
-DEFINE_CIPHER(aes128ctr, STM32_CIPHER_MODE_CTR, 128, 16, 16, 1, "stm32-ctr-aes");
-DEFINE_CIPHER(aes192ctr, STM32_CIPHER_MODE_CTR, 192, 24, 16, 1, "stm32-ctr-aes");
-DEFINE_CIPHER(aes256ctr, STM32_CIPHER_MODE_CTR, 256, 32, 16, 1, "stm32-ctr-aes");
+DEFINE_CIPHER(aes128ctr, STM32_CIPHER_MODE_CTR, 128, 16, 16, 1, "ctr(aes)");
+DEFINE_CIPHER(aes192ctr, STM32_CIPHER_MODE_CTR, 192, 24, 16, 1, "ctr(aes)");
+DEFINE_CIPHER(aes256ctr, STM32_CIPHER_MODE_CTR, 256, 32, 16, 1, "ctr(aes)");
 
 /*********************************************************************
  *
