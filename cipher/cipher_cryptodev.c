@@ -222,6 +222,10 @@ int stm32_cipher_update(STM32_CIPHER_HW_CTX *ctx,
     memset(&cop, 0, sizeof(cop));
     cop.ses = ctx->sess.ses;
     cop.op  = ctx->encrypt ? COP_ENCRYPT : COP_DECRYPT;
+    /* force kernel copy memory-pages (NO ZERO COPY)
+    if (ctx->mode != STM32_CIPHER_MODE_CTR)
+	cop.flags = COP_FLAG_NO_ZC; 	
+     */
     cop.len = (uint32_t)inl;
     cop.src = (unsigned char *)in;
     cop.dst = out;
