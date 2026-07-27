@@ -9,7 +9,7 @@
 #include <openssl/provider.h>
 #include <openssl/engine.h>
 
-// $CC evp_bench.c -o bench -lcrypto -ldl -lpthread
+// $CC evp_bench_with_set_padding.c -o evp_padding -lcrypto -ldl -lpthread
 
 #define BENCH_CORE 0
 
@@ -56,12 +56,6 @@ static const char *cipher_name_from_algo(const char *algo)
 static int needs_iv(const char *algo)
 {
 	return strstr(algo, "-ecb") == NULL;
-}
-
-static int is_engine(const char *impl)
-{
-	return strcmp(impl, IMPL_ENG_AFALG) == 0 ||
-	       strcmp(impl, IMPL_ENG_CRYPTODEV) == 0;
 }
 
 static const char *engine_name_from_impl(const char *impl)
@@ -121,9 +115,9 @@ int main(int argc, char *argv[])
 			goto cleanup;
 		}
 
-	} else if (strcmp(impl, IMPL_PV_AFALG) == 0 || strcmp(impl, IMPL_PV_CRYPTODEV) == 0) {
+	} else if (strcmp(impl, IMPL_PV_AFALG) == 0) {
 		prov_default = OSSL_PROVIDER_load(NULL, "default");
-		prov_main = OSSL_PROVIDER_load(NULL, impl);
+		prov_main = OSSL_PROVIDER_load(NULL, "pv_afalg");
 
 		cipher_fetch = EVP_CIPHER_fetch(NULL, cipher_name, PROPQUERY_STM32);
 		if (!cipher_fetch) {
@@ -131,7 +125,19 @@ int main(int argc, char *argv[])
 			goto cleanup;
 		}
 		cipher = cipher_fetch;
-	} else if (is_engine(impl)) {
+
+	} else if (strcmp(impl, IMPL_PV_CRYPTODEV) == 0) {
+		prov_default = OSSL_PROVIDER_load(NULL, "default");
+		prov_main = OSSL_PROVIDER_load(NULL, "pv_cryptodev");
+
+		cipher_fetch = EVP_CIPHER_fetch(NULL, cipher_name, PROPQUERY_STM32);
+		if (!cipher_fetch) {
+			fprintf(stderr, "Failed to fetch cipher: %s\n", cipher_name);
+			goto cleanup;
+		}
+		cipher = cipher_fetch;
+
+	} else if (strcmp(impl, IMPL_ENG_AFALG) == 0 || strcmp(impl, IMPL_ENG_CRYPTODEV) == 0) {
 
 		OpenSSL_add_all_algorithms();
 		ENGINE_load_builtin_engines();
@@ -171,19 +177,32 @@ int main(int argc, char *argv[])
 	ctx = EVP_CIPHER_CTX_new();
 	EVP_CHECK(ctx, "EVP_CIPHER_CTX_new failed");
 
-	EVP_CHECK(EVP_EncryptInit_ex(ctx, cipher,is_engine(impl) ? eng : NULL,
-                		     key, use_iv ? iv : NULL),
-				     "EVP_EncryptInit_ex failed");
+	ENGINE *init_eng = (strcmp(impl, IMPL_ENG_AFALG) == 0 || strcmp(impl, IMPL_ENG_CRYPTODEV) == 0) ? eng : NULL;
+
+	if (!EVP_EncryptInit_ex(ctx, cipher, init_eng, key, use_iv ? iv : NULL)) {
+		fprintf(stderr, "EVP_EncryptInit_ex failed\n");
+		goto cleanup;
+	}
+
+	if (!use_iv) {
+		/* 0 : if data not aligned you must handle padding yourself,
+		   1 : keep provider handle it.
+		 */
+		if (!EVP_CIPHER_CTX_set_padding(ctx, 0)) {
+			fprintf(stderr, "EVP_CIPHER_CTX_set_padding failed\n");
+			goto cleanup;
+		}
+	}
 
 	long ops = 0;
 	double t_start = now_sec();
 	double deadline = t_start + seconds;
-	int outlen = 0;
 
 	while (1) {
 		if (now_sec() >= deadline)
 			break;
-		outlen = 0;
+
+		int outlen = 0;
 
 		EVP_CHECK(EVP_EncryptUpdate(ctx, outbuf, &outlen, inbuf, (int)block_size),
 			"EVP_EncryptUpdate failed");
@@ -193,7 +212,7 @@ int main(int argc, char *argv[])
 
 	double elapsed = now_sec() - t_start;
 
-	outlen = 0;
+	int outlen = 0;
 	EVP_CHECK(EVP_EncryptFinal_ex(ctx, outbuf, &outlen),
 		"EVP_EncryptFinal_ex failed");
 
