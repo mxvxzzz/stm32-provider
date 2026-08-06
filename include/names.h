@@ -1,12 +1,12 @@
 
-#ifndef STM32_NAMES_H
-#define STM32_NAMES_H
+#ifndef STM32_NAME_H
+#define STM32_NAME_H
 
 /* 
- * Names OIDs of algorithmes supported
+ * NAMES OIDs of algorithmes supported
  *
  * Convention OpenSSL : "NOM_PRINCIPAL:ALIAS:OID"
- * Source : openssl/providers/implementations/include/prov/names.h
+ * Source : openssl/STM32iders/implementations/include/STM32/NAME.h
 */
 
 /* Digests */
@@ -38,6 +38,16 @@
 #define STM32_NAME_AES_256_CTR     "AES-256-CTR"
 #define STM32_NAME_AES_192_CTR     "AES-192-CTR"
 #define STM32_NAME_AES_128_CTR     "AES-128-CTR"
+
+
+/* Ciphers AEAD */
+
+#define STM32_NAME_AES_256_GCM "AES-256-GCM:id-aes256-GCM:2.16.840.1.101.3.4.1.46"
+#define STM32_NAME_AES_192_GCM "AES-192-GCM:id-aes192-GCM:2.16.840.1.101.3.4.1.26"
+#define STM32_NAME_AES_128_GCM "AES-128-GCM:id-aes128-GCM:2.16.840.1.101.3.4.1.6"
+#define STM32_NAME_AES_256_CCM "AES-256-CCM:id-aes256-CCM:2.16.840.1.101.3.4.1.47"
+#define STM32_NAME_AES_192_CCM "AES-192-CCM:id-aes192-CCM:2.16.840.1.101.3.4.1.27"
+#define STM32_NAME_AES_128_CCM "AES-128-CCM:id-aes128-CCM:2.16.840.1.101.3.4.1.7"
 
 /* Prpts */
 #define STM32_PROV_PROPS        "provider=stm32"
