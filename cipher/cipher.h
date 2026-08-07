@@ -11,6 +11,8 @@ typedef enum {
 	STM32_CIPHER_MODE_CTR
 } STM32_CIPHER_MODE;	
 
+#define STM32_AES_BLOCK_SIZE 16U
+
 typedef struct __stm32_cipher_hw_ctx_st__ STM32_CIPHER_HW_CTX;
 
 STM32_CIPHER_HW_CTX *stm32_cipher_newctx(void *provctx, const char *alg_name,
