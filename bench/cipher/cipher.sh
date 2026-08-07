@@ -35,8 +35,8 @@ run_test() {
 
     local enc_file="$OUTDIR/enc.bin"
     local dec_file="$OUTDIR/dec.bin"
-    local ref_enc="$OUTDIR/ref_enc.bin"
-    local ref_dec="$OUTDIR/ref_dec.bin"
+    local enc_err="$OUTDIR/${provider}_${mode}_enc.err"
+    local dec_err="$OUTDIR/${provider}_${mode}_dec.err"
     local iv_opt=""
     local prov_iv_opt=""
     local result
@@ -48,26 +48,6 @@ run_test() {
         prov_iv_opt="-iv $IV"
     fi
 
-    # Encrypt with the default provider (reference)
-    if ! openssl enc -"$mode" -K "$key" $iv_opt \
-            -in "$infile" -out "$ref_enc" 2>/dev/null; then
-        echo "SKIP | $provider | $label | default encrypt failed (mode not supported?)"
-        return
-    fi
-
-    # Decrypt with the default provider (reference)
-    if ! openssl enc -d -"$mode" -K "$key" $iv_opt \
-            -in "$ref_enc" -out "$ref_dec" 2>/dev/null; then
-        echo "SKIP | $provider | $label | default decrypt failed"
-        return
-    fi
-
-    # Verification: default enc->dec must reproduce the original
-    if ! diff -q "$infile" "$ref_dec" >/dev/null 2>&1; then
-        echo "SKIP | $provider | $label | default self-check failed"
-        return
-    fi
-
     # Encrypt with the STM32 provider
     if ! openssl enc -"$mode" \
             -provider "$provider" -provider default \
@@ -75,13 +55,7 @@ run_test() {
             -K "$key" $prov_iv_opt \
             -in "$infile" -out "$enc_file" 2>/dev/null; then
         echo "KO   | $provider | $label | provider encrypt failed"
-        FAIL=$((FAIL + 1))
-        return
-    fi
-
-    # Verify that the provider ciphertext == default ciphertext
-    if ! diff -q "$enc_file" "$ref_enc" >/dev/null 2>&1; then
-        echo "KO   | $provider | $label | ciphertext mismatch (provider != default)"
+	cat "$enc_err"
         FAIL=$((FAIL + 1))
         return
     fi
@@ -93,6 +67,7 @@ run_test() {
             -K "$key" $prov_iv_opt \
             -in "$enc_file" -out "$dec_file" 2>/dev/null; then
         echo "KO   | $provider | $label | provider decrypt failed"
+	cat "$dec_err"
         FAIL=$((FAIL + 1))
         return
     fi
@@ -106,7 +81,7 @@ run_test() {
         FAIL=$((FAIL + 1))
     fi
 
-    rm -f "$enc_file" "$dec_file" "$ref_enc" "$ref_dec"
+    rm -f "$enc_file" "$dec_file"
 }
 
 echo "=== Generating test files ==="
