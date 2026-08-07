@@ -97,7 +97,7 @@ static int cdev_open_session(STM32_CIPHER_HW_CTX *ctx)
 
 static void ctr_increment_iv(unsigned char iv[16], size_t bytes_processed)
 {
-    size_t  blocks = bytes_processed / 16;
+    size_t  blocks = bytes_processed / STM32_AES_BLOCK_SIZE;
     int     i;
     unsigned int carry;
 
@@ -216,8 +216,8 @@ int stm32_cipher_update(STM32_CIPHER_HW_CTX *ctx,
         return 1;
     }
 
-    if (ctx->mode == STM32_CIPHER_MODE_CBC && !ctx->encrypt && inl >= 16)
-        memcpy(saved_iv, in + inl - 16, 16);
+    if (ctx->mode == STM32_CIPHER_MODE_CBC && !ctx->encrypt && inl >= STM32_AES_BLOCK_SIZE)
+        memcpy(saved_iv, in + inl - STM32_AES_BLOCK_SIZE, STM32_AES_BLOCK_SIZE);
 
     memset(&cop, 0, sizeof(cop));
     cop.ses = ctx->sess.ses;

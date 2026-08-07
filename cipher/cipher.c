@@ -66,7 +66,7 @@ struct stm32_cipher_ctx_st {
 	int initialized;
 	unsigned char key[32];
 	unsigned char iv[16];
-	unsigned char buf[16]; /* buffer for partial blocks */
+	unsigned char buf[STM32_AES_BLOCK_SIZE]; /* buffer for partial blocks */
 	size_t buf_len;
 };
 
@@ -130,7 +130,7 @@ static void *cipher_dupctx(void *vctx)
 		return NULL;
 
 	dst->provctx = src->provctx;
-	dst->hw_ctx = src->hw_ctx;
+	dst->hw_ctx = NULL;
 	dst->mode = src->mode;
 	dst->keylen = src->keylen;
 	dst->ivlen = src->ivlen;
@@ -170,7 +170,12 @@ err:
 static int cipher_init(STM32_CIPHER_CTX_ *ctx, const unsigned char *key, size_t keylen,
 		const unsigned char *iv, size_t ivlen, int encrypt, const OSSL_PARAM params[]) 
 {
-	PROV_CTX *pctx = (PROV_CTX *)ctx->provctx;
+	PROV_CTX *pctx;
+
+	if (ctx == NULL)
+		return 0;
+
+	pctx = (PROV_CTX *)ctx->provctx;
 
 	if (pctx == NULL)
 		return 0;
@@ -349,7 +354,10 @@ static int cipher_update(void *vctx, unsigned char *out, size_t *outl,
 {
     STM32_CIPHER_CTX_ *ctx = (STM32_CIPHER_CTX_ *)vctx;
 
-    if (ctx == NULL || !ctx->initialized) {
+    if (ctx == NULL)
+	return 0;
+
+    if(!ctx->initialized) {
         PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_UPDATE_FAILED,
                   "cipher not initialized");
         return 0;
@@ -397,18 +405,22 @@ static int cipher_final(void *vctx, unsigned char *out, size_t *outl,
     STM32_CIPHER_CTX_ *ctx       = (STM32_CIPHER_CTX_ *)vctx;
     PROV_CTX          *pctx;
     size_t             bs;
-    unsigned char      last_block[16];
-    unsigned char      pad_byte;
+    unsigned char      last_block[STM32_AES_BLOCK_SIZE];
+    unsigned char      pad_byte; /* Padding PKCS#7 */
     size_t             plain_len;
     size_t             wrote;
     size_t             extra;
     size_t             i;
 
-    if (ctx == NULL || !ctx->initialized) {
+    if (ctx == NULL)
+	return 0;
+
+    if (!ctx->initialized) {
         PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_CIPHER_FINAL_FAILED,
                   "cipher not initialized");
         return 0;
     }
+
     if (outl == NULL) {
         PUT_ERROR((PROV_CTX *)ctx->provctx, STM32_R_INVALID_ARGUMENT,
                   "outl is NULL");
@@ -546,8 +558,7 @@ static int cipher_get_params(OSSL_PARAM params[], STM32_CIPHER_MODE mode,
 	p = OSSL_PARAM_locate(params, OSSL_CIPHER_PARAM_MODE);
 	if (p != NULL) {
 		switch (mode) {
-			/* fix temp :
-			 *
+			/* 
 			 * /local/home/tabkioum/openssl/providers/implementations/ciphers/ciphercommon.c
 			 *
 			 * Macro in : /local/home/tabkioum/openssl/include/openssl/evp.h
