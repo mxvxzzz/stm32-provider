@@ -195,8 +195,8 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
   See the latest performance reports:
 
-	- **Digest benchmarks**: SHA-1, SHA-256, and SHA-512
+- **Digest benchmarks**: SHA-1, SHA-256, and SHA-512
 
-	- **Cipher benchmarks**: AES ECB/CBC/CTR (128/192/256)
+- **Cipher benchmarks**: AES ECB/CBC/CTR (128/192/256)
 
 👉 [View Benchmark Reports](https://mxvxzzz.github.io/stm32mpu-benchmarks/)
