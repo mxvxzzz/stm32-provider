@@ -108,13 +108,15 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
   For AES-192-ECB, the key size is 24 bytes (48 characters in hexa).
 
+  Generate a random key: `export KEY=$(openssl rand -hex 24)`
+
   Encryption:
 
-  `openssl enc -aes-192-ecb -provider stm32prov -provider default -propquery "provider=stm32" -K 00112233445566778899aabbccddeeff0001020304050607 -in /tmp/data.bin -out /tmp/enc_ecb.bin`
+  `openssl enc -aes-192-ecb -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -in /tmp/data.bin -out /tmp/enc_ecb.bin`
 
   Decryption:
 
-  `openssl enc -d -aes-192-ecb -provider stm32prov -provider default -propquery "provider=stm32" -K 00112233445566778899aabbccddeeff0001020304050607 -in /tmp/enc_ecb.bin -out /tmp/dec_ecb.bin`
+  `openssl enc -d -aes-192-ecb -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -in /tmp/enc_ecb.bin -out /tmp/dec_ecb.bin`
 
   Verify the result:
 
@@ -122,17 +124,21 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
 - Encrypt and decrypt a file using AES-128-CBC
 
-  For AES-128-CBC, the key size is 16 bytes, (32 characters in hexa).
+  For AES-128-CBC, the key size is 16 bytes, (32 characters in hexa), the IV size is 16 bytes.
 
-  The IV size is 16 bytes.
+  Generate a random key and IV:
+
+  `export KEY=$(openssl rand -hex 16)`
+
+  `export IV=$(openssl rand -hex 16)`
 
   Encryption:
 
-  `openssl enc -aes-128-cbc -provider stm32prov -provider default -propquery "provider=stm32" -K 00112233445566778899aabbccddeeff -iv 0102030405060708090a0b0c0d0e0f10 -in /tmp/data.bin -out /tmp/enc_cbc.bin`
+  `openssl enc -aes-128-cbc -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/data.bin -out /tmp/enc_cbc.bin`
 
   Decryption:
 
-  `openssl enc -d -aes-128-cbc -provider stm32prov -provider default -propquery "provider=stm32" -K 00112233445566778899aabbccddeeff -iv 0102030405060708090a0b0c0d0e0f10 -in /tmp/enc_cbc.bin -out /tmp/dec_cbc.bin`
+  `openssl enc -d -aes-128-cbc -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/enc_cbc.bin -out /tmp/dec_cbc.bin`
 
   Verify the result:
 
@@ -145,8 +151,6 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
   Generate a random key and IV:
 
   `export KEY=$(openssl rand -hex 32)`
-
-  `export IV=$(openssl rand -hex 16)`
 
   Encryption:
 
