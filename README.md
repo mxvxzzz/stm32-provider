@@ -123,9 +123,10 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 - Encrypt and decrypt a file using AES-128-CBC
 
   For AES-128-CBC, the key size is 16 bytes, (32 characters in hexa).
+
   The IV size is 16 bytes.
 
-Encryption:
+  Encryption:
 
   `openssl enc -aes-128-cbc -provider stm32prov -provider default -propquery "provider=stm32" -K 00112233445566778899aabbccddeeff -iv 0102030405060708090a0b0c0d0e0f10 -in /tmp/data.bin -out /tmp/enc_cbc.bin`
 
