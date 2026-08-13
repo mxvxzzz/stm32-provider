@@ -8,35 +8,26 @@ run_impl_full() {
 
   $BENCH "$impl" 5 16
   $BENCH "$impl" 5 23
-  $BENCH "$impl" 5 31
   $BENCH "$impl" 5 39
-  $BENCH "$impl" 5 47
-  $BENCH "$impl" 5 53
   $BENCH "$impl" 5 64
-  $BENCH "$impl" 5 91
   $BENCH "$impl" 5 128
   $BENCH "$impl" 5 256
   $BENCH "$impl" 5 512
   $BENCH "$impl" 5 1024
   $BENCH "$impl" 5 2048
-  $BENCH "$impl" 5 4075
   $BENCH "$impl" 5 4096
-  $BENCH "$impl" 5 6191
   $BENCH "$impl" 5 8192
-  $BENCH "$impl" 5 9193
   $BENCH "$impl" 5 16384
   $BENCH "$impl" 5 32768
-  $BENCH "$impl" 5 52767
   $BENCH "$impl" 5 65536
   $BENCH "$impl" 5 95535
   $BENCH "$impl" 5 131072
-  $BENCH "$impl" 5 171071
+  $BENCH "$impl" 5 200704
   $BENCH "$impl" 5 262144
-  $BENCH "$impl" 5 479145
+  $BENCH "$impl" 5 422144
   $BENCH "$impl" 5 524288
-  $BENCH "$impl" 5 624289
-  $BENCH "$impl" 5 732224
-  $BENCH "$impl" 5 832224
+  $BENCH "$impl" 5 742144
+  $BENCH "$impl" 5 902144
   $BENCH "$impl" 5 1000000
 }
 
@@ -45,29 +36,20 @@ run_impl_short() {
 
   $BENCH "$impl" 5 16
   $BENCH "$impl" 5 23
-  $BENCH "$impl" 5 31
   $BENCH "$impl" 5 39
-  $BENCH "$impl" 5 47
-  $BENCH "$impl" 5 53
   $BENCH "$impl" 5 64
-  $BENCH "$impl" 5 91
   $BENCH "$impl" 5 128
   $BENCH "$impl" 5 256
   $BENCH "$impl" 5 512
   $BENCH "$impl" 5 1024
   $BENCH "$impl" 5 2048
-  $BENCH "$impl" 5 4075
   $BENCH "$impl" 5 4096
-  $BENCH "$impl" 5 6191
   $BENCH "$impl" 5 8192
-  $BENCH "$impl" 5 9193
   $BENCH "$impl" 5 16384
   $BENCH "$impl" 5 32768
-  $BENCH "$impl" 5 52767
   $BENCH "$impl" 5 65536
   $BENCH "$impl" 5 95535
   $BENCH "$impl" 5 131072
-  $BENCH "$impl" 5 171071
   $BENCH "$impl" 5 200704
 }
 
