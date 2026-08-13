@@ -171,7 +171,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
   See the OpenSSL documentation chapter `SUPPORTED CIPHERS` for details:
 
-  - [`openssl enc` notes](https://docs.openssl.org/3.3/man1/openssl-enc/#notes)
+  👉 https://docs.openssl.org/3.3/man1/openssl-enc/#notes
 
   To handle AEAD modes, OpenSSL EVP provide native support.
   
