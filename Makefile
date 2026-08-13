@@ -25,7 +25,7 @@ PKG_CONFIG ?= pkg-config
 
 # config ( dev / release ) ( afalg / cryptodev )
 BUILD ?= dev
-BACKEND ?= cryptodev
+BACKEND ?= afalg
 
 TARGET = stm32prov.so
 SRCS = prov.c \
@@ -46,9 +46,9 @@ CPPFLAGS += -DBACKEND_AFALG # SHA3 in digest.c
 endif
 
 ifeq ($(BACKEND),cryptodev)
-SRCS += digest/hash_cryptodev.c
-SRCS += hmac/hmac_cryptodev.c
-SRCS += cipher/cipher_cryptodev.c
+SRCS += digest/hash_devcrypto.c
+SRCS += hmac/hmac_devcrypto.c
+SRCS += cipher/cipher_devcrypto.c
 SRCS += aead/aead_devcrypto.c
 CPPFLAGS += -I./warning/include # tempo(SDK)  -I/usr/local/include/
 CPPFLAGS += -DBACKEND_CRYPTODEV # SHA3 not available for cryptodev / in digest.c
