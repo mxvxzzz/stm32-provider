@@ -5,6 +5,10 @@
 #include "include/prov.h"
 #include "include/err.h"   // libprov — proverr_new_handle, proverr_free_handle
 
+#define MAX_CIPHER_ALGOS 16 /* 9 + 6 + 1 */
+static OSSL_ALGORITHM all_ciphers[MAX_CIPHER_ALGOS];
+static int all_ciphers_built = 0;
+
 /* forward declarations with types OSSL_FUNC_**/
 static OSSL_FUNC_provider_gettable_params_fn prov_gettable_params;
 static OSSL_FUNC_provider_get_params_fn prov_get_params;
@@ -13,12 +17,6 @@ static OSSL_FUNC_provider_unquery_operation_fn prov_unquery;
 static OSSL_FUNC_provider_get_reason_strings_fn prov_get_reason_strings_disptach;
 static OSSL_FUNC_provider_get_capabilities_fn prov_get_capabilities;
 static OSSL_FUNC_provider_self_test_fn prov_self_test;
-
-/*********************************************************************
- *
- *  The implementation 
- *
- *****/
 
 /*********************************************************************
  * 
@@ -41,6 +39,7 @@ static const OSSL_PARAM *prov_gettable_params(void *provctx)
     (void)provctx;
     return prov_param_types;
 }
+
 static int prov_get_params(void *provctx, OSSL_PARAM params[])
 {
     (void)provctx;
@@ -71,6 +70,27 @@ static int prov_get_params(void *provctx, OSSL_PARAM params[])
  *
  *****/
 
+/* Helper function to combine all ciphers */
+const OSSL_ALGORITHM *get_all_ciphers(void)
+{
+    int i;
+    int n;
+
+    if (all_ciphers_built)
+        return all_ciphers;
+
+    n = 0;
+    for (i = 0; stm32_ciphers[i].algorithm_names != NULL; i++)
+        all_ciphers[n++] = stm32_ciphers[i];
+
+    for (i = 0; stm32_aead_ciphers[i].algorithm_names != NULL; i++)
+        all_ciphers[n++] = stm32_aead_ciphers[i];
+
+    memset(&all_ciphers[n], 0, sizeof(OSSL_ALGORITHM));
+    all_ciphers_built = 1;
+    return all_ciphers;
+}
+
 /* query */
 static const OSSL_ALGORITHM *prov_query(void *provctx, int operation_id, int *no_cache)
 {
@@ -83,7 +103,7 @@ static const OSSL_ALGORITHM *prov_query(void *provctx, int operation_id, int *no
         case OSSL_OP_MAC :
             return stm32_macs;
         case OSSL_OP_CIPHER : 
-            return stm32_ciphers;
+            return get_all_ciphers();
         default :
             break;
     }

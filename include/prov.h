@@ -25,6 +25,8 @@ void provider_ctx_free(PROV_CTX *ctx);
 extern const OSSL_ALGORITHM stm32_digests[];
 extern const OSSL_ALGORITHM stm32_macs[];
 extern const OSSL_ALGORITHM stm32_ciphers[];
+extern const OSSL_ALGORITHM stm32_aead_ciphers[];
+const OSSL_ALGORITHM *get_all_ciphers(void);
 
 /* Strings error supported / names coherent with err.c */
 extern const OSSL_ITEM stm32_reason_strings[];
