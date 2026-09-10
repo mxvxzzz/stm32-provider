@@ -1,4 +1,4 @@
-# stmaead - Outil CLI AES-GCM/CCM of STM32
+# stmaead - CLI tool for AES-GCM/CCM of STM32
 
 Command-line tool to encrypt and decrypt files using AES-GCM or AES-CCM
 through the STM32 provider (CRYP hardware acceleration).
