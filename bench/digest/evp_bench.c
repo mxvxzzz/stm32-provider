@@ -8,12 +8,9 @@
 #include <openssl/evp.h>
 #include <openssl/provider.h>
 
-#define IMPL_AFALG      "st_afalg"
-#define IMPL_CRYPTODEV  "st_cryptodev"
 #define IMPL_IS(s)      (strcmp(impl, (s)) == 0)
-
-#define PROVIDER_NAME_AFALG     "st_afalg"
-#define PROVIDER_NAME_CRYPTODEV "st_cryptodev"
+#define IMPL_AFALG     "st_afalg"
+#define IMPL_CRYPTODEV "st_cryptodev"
 #define PROVIDER_NAME_DEFAULT   "default"
 #define PROPQUERY_STM32         "provider=stm32"
 
@@ -66,10 +63,10 @@ int main(int argc, char *argv[])
     } while(0)
 
     if (IMPL_IS(IMPL_AFALG)) {
-        LOAD_PROVIDER(prov_main,    PROVIDER_NAME_AFALG);
+        LOAD_PROVIDER(prov_main,    IMPL_AFALG);
         LOAD_PROVIDER(prov_default, PROVIDER_NAME_DEFAULT);
     } else if (IMPL_IS(IMPL_CRYPTODEV)) {
-        LOAD_PROVIDER(prov_main,    PROVIDER_NAME_CRYPTODEV);
+        LOAD_PROVIDER(prov_main,    IMPL_CRYPTODEV);
         LOAD_PROVIDER(prov_default, PROVIDER_NAME_DEFAULT);
     } else {
         fprintf(stderr, "Unknown impl: %s\n", impl);

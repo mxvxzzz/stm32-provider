@@ -9,11 +9,12 @@
 #include <openssl/provider.h>
 #include <openssl/engine.h>
 
-// $CC evp_bench.c -o bench -lcrypto -ldl -lpthread
+// $CC evp_bench.c -o evp_bench -lcrypto -ldl -lpthread
 
 #define BENCH_CORE 0
 
 #define IMPL_SOFT          "soft"
+#define IMPL_STM32PROV     "stm32prov"
 #define IMPL_PV_AFALG      "pv_afalg"
 #define IMPL_PV_CRYPTODEV  "pv_cryptodev"
 #define IMPL_ENG_AFALG     "eng_afalg"
@@ -121,7 +122,8 @@ int main(int argc, char *argv[])
 			goto cleanup;
 		}
 
-	} else if (strcmp(impl, IMPL_PV_AFALG) == 0 || strcmp(impl, IMPL_PV_CRYPTODEV) == 0) {
+	} else if (strcmp(impl, IMPL_PV_AFALG) == 0 || strcmp(impl, IMPL_PV_CRYPTODEV) == 0 
+			|| strcmp(impl, IMPL_STM32PROV) == 0) {
 		prov_default = OSSL_PROVIDER_load(NULL, "default");
 		prov_main = OSSL_PROVIDER_load(NULL, impl);
 
