@@ -27,7 +27,7 @@ stmaead dec -algo gcm|ccm -K <hex> -in <file> -out <file>
 |-------------|---------------------------------------------------------|
 | `-algo`     | `gcm` ou `ccm` (required)                           	|
 | `-K`        | AES key in hex (32/48/64 chars -> 128/192/256 auto)    	|
-| `-iv`       | Nonce in hex (obligatoire pour enc)                    	|
+| `-iv`       | Nonce in hex                 	|
 | `-aad`      | Additional Authenticated Data in hex (optionnel)       	|
 | `-taglen`   | Tag size 4-16 bytes (default: 16)                 	|
 | `-in`       | Input file	                                    	|
