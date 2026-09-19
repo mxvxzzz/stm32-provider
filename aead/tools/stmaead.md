@@ -25,12 +25,12 @@ stmaead dec -algo gcm|ccm -K <hex> -in <file> -out <file>
 
 | Option      | Description                                           	|
 |-------------|---------------------------------------------------------|
-| `-algo`     | `gcm` ou `ccm` (required)                           	|
+| `-algo`     | `gcm` ou `ccm`                                        	|
 | `-K`        | AES key in hex (32/48/64 chars -> 128/192/256 auto)    	|
-| `-iv`       | Nonce in hex                 	|
+| `-iv`       | Nonce in hex                 	                        |
 | `-aad`      | Additional Authenticated Data in hex (optionnel)       	|
 | `-taglen`   | Tag size 4-16 bytes (default: 16)                 	|
-| `-in`       | Input file	                                    	|
+| `-in`       | Input file	                                    |
 | `-out`      | Output file                                     	|
 | `-provider` | `stm32prov` either implementation (AF_ALG or CRYPTODEV) |
 | `-soft`     | Use implemntation software instead of hardware          |
