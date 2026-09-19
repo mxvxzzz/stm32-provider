@@ -8,7 +8,7 @@ Here is a overviweuw of the CryptoAPI architecture, from User space to hardware 
 
 ## CryptoAPI overview with STM32 Provider
 
-![Architecture Crypto](./images/drawio.svg)
+![Architecture Crypto](./images/cryptoAPI.png)
 
 ## Project Layout & Components
 
@@ -158,7 +158,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
   For AES-256-CTR, the key size is 32 bytes, (64 characters hexa).  
 
-  Generate a random key and IV:
+  Generate a random key (same IV):
 
   `export KEY=$(openssl rand -hex 32)`
 
