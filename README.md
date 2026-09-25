@@ -1,12 +1,10 @@
 # STM32 OpenSSL Provider
 
-In OpenSSL terms, a provider is a unit of code that offers implementations for cryptographic operations such as digests, ciphers, signatures, and more.
-
-STM32 Provider offloads cryptographic operations for security peripherals embedded in ST MPUs, through the Linux AF_ALG and Cryptodev.
-
-Here is an overview of the CryptoAPI architecture, from user space to hardware:
+In OpenSSL terms, a provider is a unit of code that offers implementations for cryptographic operations such as digests, ciphers, signatures, and more. STM32 Provider offloads cryptographic operations for security peripherals embedded in ST MPUs, through the Linux AF_ALG and Cryptodev.
 
 ## CryptoAPI overview with STM32 Provider
+
+Here is an overview of the CryptoAPI architecture, from user space to hardware:
 
 ![Architecture Crypto](./images/cryptoAPI.png)
 
@@ -34,20 +32,20 @@ This project uses:
 ## Implemented algorithms
 
 ### Digest
-SHA-1, SHA-224, SHA-256, SHA-384, SHA-512,  
+SHA-1, SHA-224, SHA-256, SHA-384, SHA-512,
 SHA3-256, SHA3-384, SHA3-512
 
 ### HMAC
-HMAC-SHA-1, HMAC-SHA-224, HMAC-SHA-256, HMAC-SHA-384,  
+HMAC-SHA-1, HMAC-SHA-224, HMAC-SHA-256, HMAC-SHA-384,
 HMAC-SHA-512, HMAC-SHA3-256, HMAC-SHA3-384, HMAC-SHA3-512
 
 ### Cipher AES
-AES-128-ECB, AES-192-ECB, AES-256-ECB,  
-AES-128-CBC, AES-192-CBC, AES-256-CBC,  
+AES-128-ECB, AES-192-ECB, AES-256-ECB,
+AES-128-CBC, AES-192-CBC, AES-256-CBC,
 AES-128-CTR, AES-192-CTR, AES-256-CTR
 
 ### Cipher AEAD
-AES-128-GCM, AES-192-GCM, AES-256-GCM,  
+AES-128-GCM, AES-192-GCM, AES-256-GCM,
 AES-128-CCM, AES-192-CCM, AES-256-CCM
 
 ---
@@ -119,8 +117,6 @@ source <SDK_DIR>/environment-setup-cortexa35-ostl-linux
 make clean
 make BACKEND=afalg          # or: make BACKEND=cryptodev
 ```
-
-Setting `CC` to the SDK compiler without sourcing the script omits `--sysroot`, and the build fails with `openssl/core.h: No such file or directory`.
 
 ### Cross-compilation with another toolchain
 
