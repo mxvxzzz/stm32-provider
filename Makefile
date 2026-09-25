@@ -81,7 +81,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(DEPS) $(TARGET)
+	rm -f $(OBJS) $(DEPS)
 
 -include $(DEPS)
 
