@@ -52,6 +52,72 @@ AES-128-CCM, AES-192-CCM, AES-256-CCM
 
 ---
 
+## Building the provider
+
+### Prerequisites
+
+Ensure you have the following installed:
+- GCC compiler (native or cross-compiler)
+- pkg-config
+- OpenSSL development headers (`libcrypto`)
+
+### Native compilation
+
+To compile the provider for your current platform:
+
+```bash
+make
+```
+
+Or specify the build mode:
+
+```bash
+make BUILD=dev       # Development mode (no optimization, with debug symbols)
+make BUILD=release   # Release mode (optimized with -O2)
+```
+
+By default, the provider uses **AF_ALG** as the backend. To use the **Cryptodev** backend instead:
+
+```bash
+make BACKEND=cryptodev
+```
+
+### Cross-compilation
+
+To cross-compile the provider for a different target architecture (e.g., ARM64), set the `CC` environment variable to your cross-compiler:
+
+```bash
+# For ARMv8 (aarch64)
+CC=aarch64-linux-gcc make BUILD=release
+
+# Or with your toolchain prefix
+CC=aarch64-ostl-linux-gcc make BUILD=release BACKEND=afalg
+```
+
+If `pkg-config` is not available or incorrect for the target, you may need to specify paths manually:
+
+```bash
+CC=aarch64-linux-gcc \
+PKG_CONFIG=aarch64-linux-pkg-config \
+CPPFLAGS="-I/path/to/target/include" \
+LDFLAGS="-L/path/to/target/lib" \
+make BUILD=release
+```
+
+### Output
+
+After compilation, the shared library `stm32prov.so` will be created in the project root directory.
+
+### Cleaning
+
+To remove build artifacts:
+
+```bash
+make clean
+```
+
+---
+
 ## How to load the provider
 
 OpenSSL command-line tools accept provider options such as -provider and -provider-path, and openssl list can display loaded providers, provider versions, and available algorithms.
