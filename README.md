@@ -15,21 +15,21 @@ Here is an overview of the CryptoAPI architecture, from user space to hardware:
 This project uses:
 - A custom OpenSSL provider module: `stm32prov.so`
 - Implementations through `AF_ALG` and `Cryptodev`
-- `libprov` : A helper library used for provider-side error reporting
-- `include/err.h` + `err.c` : Provides provider-specific error handling and reason strings
+- `libprov`: A helper library used for provider-side error reporting
+- `include/err.h` + `err.c`: Provides provider-specific error handling and reason strings
 ---
 
 ### Internal Workflow
 
-- **Entry Point (`prov.c`):** The main entry point that registers the provider and sets up the OpenSSL dispatch tables for the supported operations (Digests, Ciphers, etc.).
+- **Entry Point (`prov.c`)**: The main entry point that registers the provider and sets up the OpenSSL dispatch tables for the supported operations (Digests, Ciphers, etc.).
 
-- **Operation Layer (`digest/`, `hmac/`, `cipher/`, `aead/`):** Implements the standard OpenSSL interfaces (`newctx`, `init`, `update`, `final`) to dispatch algorithms.
+- **Operation Layer (`digest/`, `hmac/`, `cipher/`, `aead/`)**: Implements the standard OpenSSL interfaces (`newctx`, `init`, `update`, `final`) to dispatch algorithms.
 
-- **Precompilation Switch:** A build-time configuration flag that selects the targeted Linux kernel API backend.
+- **Precompilation Switch**: A build-time configuration flag that selects the targeted Linux kernel API backend.
 
-- **Kernel Backends:** Depending on the precompilation switch, the code utilizes dedicated source files tailored for each interface—either using Linux `AF_ALG` (e.g., `*_afalg.c`) or `Cryptodev` with `/dev/crypto` (e.g., `*_devcrypto.c`) to bridge operations like digests, ciphers, or HMACs with the kernel.
+- **Kernel Backends**: Depending on the precompilation switch, the code utilizes dedicated source files tailored for each interface—either using Linux `AF_ALG` (e.g., `*_afalg.c`) or `Cryptodev` with `/dev/crypto` (e.g., `*_devcrypto.c`) to bridge operations like digests, ciphers, or HMACs with the kernel.
 
-- **Hardware Acceleration:** The Linux Crypto API routes these requests directly to the dedicated **STM32 HASH or CRYP Processors** via their respective drivers.
+- **Hardware Acceleration**: The Linux Crypto API routes these requests directly to the dedicated **STM32 HASH or CRYP Processors** via their respective drivers.
 
 ## Implemented algorithms
 
@@ -120,149 +120,172 @@ make clean
 
 ## How to load the provider
 
-OpenSSL command-line tools accept provider options such as -provider and -provider-path, and openssl list can display loaded providers, provider versions, and available algorithms.
+OpenSSL command-line tools accept provider options such as `-provider` and `-provider-path`. The `openssl list` command can display loaded providers, provider versions, and available algorithms.
 
-- List loaded providers
+- **List loaded providers:**
 
-  `openssl list -providers`
-- Load this provider from the current directory
+  ```bash
+  openssl list -providers
+  ```
 
-  `openssl list -provider-path . -provider stm32prov -providers`
-- List digest algorithms exposed by this provider
+- **Load this provider from the current directory:**
 
-  `openssl list -provider-path . -provider stm32prov -digest-algorithms`
-- Verbose provider information
+  ```bash
+  openssl list -provider-path . -provider stm32prov -providers
+  ```
 
-  `openssl list -provider-path . -provider stm32prov -providers -verbose`
+- **List digest algorithms exposed by this provider:**
 
-- Set the environment variable `OPENSSL_MODULES` to the directory containing the provider shared library without `-provider-path`.
-  Example:
+  ```bash
+  openssl list -provider-path . -provider stm32prov -digest-algorithms
+  ```
 
-  `export OPENSSL_MODULES=$HOME/your_module_directory`
+- **Display verbose provider information:**
+
+  ```bash
+  openssl list -provider-path . -provider stm32prov -providers -verbose
+  ```
+
+- **Set the `OPENSSL_MODULES` environment variable** to the directory containing the provider shared library (alternative to `-provider-path`):
+
+  ```bash
+  export OPENSSL_MODULES=$HOME/your_module_directory
+  ```
 
 ## Usage examples
 
-### Digest :
+### Digest
 
-- Compute a SHA256 digest with STM32 provider
+- **Compute a SHA256 digest with STM32 provider:**
 
-  `openssl dgst -provider stm32prov -propquery "provider=stm32" -sha256 /file.txt`
+  ```bash
+  openssl dgst -provider stm32prov -propquery "provider=stm32" -sha256 /file.txt
+  ```
 
-- Benchmark using openssl speed of SHA3-512 with STM32 provider
+- **Benchmark SHA3-512 with STM32 provider:**
 
-  `openssl speed -provider stm32prov -propquery "provider=stm32" -evp sha3-512`
+  ```bash
+  openssl speed -provider stm32prov -propquery "provider=stm32" -evp sha3-512
+  ```
 
-- You can also use options such as `-seconds`, `-elapsed`, and `-bytes` to customize the benchmark. 
+- **Customize the benchmark** with options such as `-seconds`, `-elapsed`, and `-bytes`:
 
-  `openssl speed -seconds 10 -elapsed -bytes 8192 -provider stm32prov -propquery "provider=stm32" sha256`
+  ```bash
+  openssl speed -seconds 10 -elapsed -bytes 8192 -provider stm32prov -propquery "provider=stm32" sha256
+  ```
 
-  For more details, refer to the `openssl speed` documentation.
-
-  👉 https://docs.openssl.org/3.1/man1/openssl-speed/
+  For more details, refer to the [openssl speed documentation](https://docs.openssl.org/3.1/man1/openssl-speed/).
 
 ### HMAC
-  
- - Create the input file :
 
-  `echo "This is a secret message to authenticate." > data.bin`
+- **Create the input file:**
 
- - Generate a key :
+  ```bash
+  echo "This is a secret message to authenticate." > data.bin
+  ```
 
-  `KEY_HEX=$(openssl rand -hex 32)`
+- **Generate a key:**
 
- - Compute the HMAC :
+  ```bash
+  KEY_HEX=$(openssl rand -hex 32)
+  ```
 
-  `openssl mac -digest SHA256 -macopt hexkey:$KEY_HEX -in data.bin -provider stm32prov -propquery "provider=stm32" HMAC`
+- **Compute the HMAC:**
+
+  ```bash
+  openssl mac -digest SHA256 -macopt hexkey:$KEY_HEX -in data.bin -provider stm32prov -propquery "provider=stm32" HMAC
+  ```
 
 ### CIPHER AES ECB/CBC/CTR
 
-- Create the input file
+- **Create the input file:**
 
-  `echo "This is a test message" > /tmp/data.bin`
+  ```bash
+  echo "This is a test message" > /tmp/data.bin
+  ```
 
-- Encrypt and decrypt a file using AES-192-ECB
+- **AES-192-ECB** (key size: 24 bytes / 48 hex characters)
 
-  For AES-192-ECB, the key size is 24 bytes (48 characters in hex).
+  Generate a random key:
+  ```bash
+  export KEY=$(openssl rand -hex 24)
+  ```
 
-  Generate a random key: `export KEY=$(openssl rand -hex 24)`
+  Encrypt:
+  ```bash
+  openssl enc -aes-192-ecb -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -in /tmp/data.bin -out /tmp/enc_ecb.bin
+  ```
 
-  Encryption:
+  Decrypt:
+  ```bash
+  openssl enc -d -aes-192-ecb -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -in /tmp/enc_ecb.bin -out /tmp/dec_ecb.bin
+  ```
 
-  `openssl enc -aes-192-ecb -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -in /tmp/data.bin -out /tmp/enc_ecb.bin`
+  Verify:
+  ```bash
+  diff /tmp/data.bin /tmp/dec_ecb.bin && echo "OK" || echo "ERROR"
+  ```
 
-  Decryption:
-
-  `openssl enc -d -aes-192-ecb -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -in /tmp/enc_ecb.bin -out /tmp/dec_ecb.bin`
-
-  Verify the result:
-
-  `diff /tmp/data.bin /tmp/dec_ecb.bin && echo "OK" || echo "ERROR"`
-
-- Encrypt and decrypt a file using AES-128-CBC
-
-  For AES-128-CBC, the key size is 16 bytes (32 characters in hex), and the IV size is 16 bytes.
+- **AES-128-CBC** (key size: 16 bytes / 32 hex characters, IV size: 16 bytes)
 
   Generate a random key and IV:
+  ```bash
+  export KEY=$(openssl rand -hex 16)
+  export IV=$(openssl rand -hex 16)
+  ```
 
-  `export KEY=$(openssl rand -hex 16)`
+  Encrypt:
+  ```bash
+  openssl enc -aes-128-cbc -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/data.bin -out /tmp/enc_cbc.bin
+  ```
 
-  `export IV=$(openssl rand -hex 16)`
+  Decrypt:
+  ```bash
+  openssl enc -d -aes-128-cbc -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/enc_cbc.bin -out /tmp/dec_cbc.bin
+  ```
 
-  Encryption:
+  Verify:
+  ```bash
+  diff /tmp/data.bin /tmp/dec_cbc.bin && echo "OK" || echo "ERROR"
+  ```
 
-  `openssl enc -aes-128-cbc -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/data.bin -out /tmp/enc_cbc.bin`
+- **AES-256-CTR** (key size: 32 bytes / 64 hex characters)
 
-  Decryption:
+  Generate a random key:
+  ```bash
+  export KEY=$(openssl rand -hex 32)
+  ```
 
-  `openssl enc -d -aes-128-cbc -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/enc_cbc.bin -out /tmp/dec_cbc.bin`
+  Encrypt:
+  ```bash
+  openssl enc -aes-256-ctr -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/data.bin -out /tmp/enc_ctr.bin
+  ```
 
-  Verify the result:
+  Decrypt:
+  ```bash
+  openssl enc -d -aes-256-ctr -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/enc_ctr.bin -out /tmp/dec_ctr.bin
+  ```
 
-  `diff /tmp/data.bin /tmp/dec_cbc.bin && echo "OK" || echo "ERROR"`
-
-- Encrypt and decrypt a file using AES-256-CTR
-
-  For AES-256-CTR, the key size is 32 bytes (64 characters in hex).  
-
-  Generate a random key (same IV):
-
-  `export KEY=$(openssl rand -hex 32)`
-
-  Encryption:
-
-  `openssl enc -aes-256-ctr -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/data.bin -out /tmp/enc_ctr.bin`
-
-  Decryption:
-
-  `openssl enc -d -aes-256-ctr -provider stm32prov -provider default -propquery "provider=stm32" -K $KEY -iv $IV -in /tmp/enc_ctr.bin -out /tmp/dec_ctr.bin`
-
-  Verify the result:
-
-  `diff /tmp/data.bin /tmp/dec_ctr.bin && echo "OK" || echo "ERROR"`
+  Verify:
+  ```bash
+  diff /tmp/data.bin /tmp/dec_ctr.bin && echo "OK" || echo "ERROR"
+  ```
 
 ### CIPHER AEAD GCM/CCM
 
-  The `openssl enc` command does not support AEAD ciphers such as AES-GCM or AES-CCM. OpenSSL explicitly blocks these modes in the `enc` tool because streaming CLI output cannot securely validate authentication tags before data is processed, and incorrect nonce or key reuse can lead to severe security failures.
-  
+The `openssl enc` command does not support AEAD ciphers such as AES-GCM or AES-CCM. OpenSSL explicitly blocks these modes in the `enc` tool because streaming CLI output cannot securely validate authentication tags before data is processed, and incorrect nonce or key reuse can lead to severe security failures.
 
-  See the OpenSSL documentation chapter `SUPPORTED CIPHERS` for details:
+See the [OpenSSL documentation - SUPPORTED CIPHERS](https://docs.openssl.org/3.3/man1/openssl-enc/#notes) for details.
 
-  👉 https://docs.openssl.org/3.3/man1/openssl-enc/#notes
+To handle AEAD modes, OpenSSL EVP provides native support. In this project, AEAD operations are handled with the dedicated `stmaead` tool.
 
-  To handle AEAD modes, OpenSSL EVP provides native support.
-  
-  In this project, AEAD operations are handled with the dedicated `stmaead` tool.
-
-  For detailed usage and validation examples, refer to the following documentation :
-
-👉 [`aead/tools/stmaead.md`](aead/tools/stmaead.md)
+For detailed usage and validation examples, refer to [`aead/tools/stmaead.md`](aead/tools/stmaead.md).
 
 ## Benchmark Results on STM32MP257-EV1
 
-  See the latest performance reports:
+See the latest performance reports:
 
 - **Digest benchmarks**: SHA-1, SHA-256, and SHA-512
-
 - **Cipher benchmarks**: AES ECB/CBC/CTR (128/192/256)
 
-👉 [View Benchmark Reports](https://mxvxzzz.github.io/stm32mpu-benchmarks/)
+[View Benchmark Reports](https://mxvxzzz.github.io/stm32mpu-benchmarks/)
