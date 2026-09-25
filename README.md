@@ -61,6 +61,33 @@ Ensure you have the following installed:
 - pkg-config
 - OpenSSL development headers (`libcrypto`)
 
+### Getting the sources
+
+External dependencies are tracked as Git submodules (listed in `.gitmodules`). They must be fetched before building, otherwise the build fails:
+```bash
+git clone --recurse-submodules <repository-url>
+# or, in an existing checkout
+git submodule update --init --recursive
+```
+
+Check that every submodule is checked out (a leading `-` means it is not fetched yet):
+
+```bash
+git submodule status --recursive
+```
+
+### Cryptodev header (Cryptodev backend only)
+
+The Cryptodev backend needs `crypto/cryptodev.h`, which is not shipped in the ST SDK. The Makefile looks for it in `warning/include/` (ignored by Git), so the SDK does not need to be modified:
+
+```bash
+git clone --depth 1 https://github.com/cryptodev-linux/cryptodev-linux.git /tmp/cryptodev-linux
+install -D -m 644 /tmp/cryptodev-linux/crypto/cryptodev.h warning/include/crypto/cryptodev.h
+rm -rf /tmp/cryptodev-linux
+```
+
+Ideally, use the header matching the `cryptodev` kernel module version running on the target.
+
 ### Native compilation
 
 To compile the provider for your current platform:
@@ -82,7 +109,20 @@ By default, the provider uses **AF_ALG** as the backend. To use the **Cryptodev*
 make BACKEND=cryptodev
 ```
 
-### Cross-compilation
+### Cross-compilation with the ST OpenSTLinux SDK
+
+Source the SDK environment script. It sets `CC` (including `--sysroot`) and `PKG_CONFIG` for the target, so OpenSSL headers and `libcrypto` are taken from the target sysroot:
+
+```bash
+source <SDK_DIR>/environment-setup-cortexa35-ostl-linux
+
+make clean
+make BACKEND=afalg          # or: make BACKEND=cryptodev
+```
+
+Setting `CC` to the SDK compiler without sourcing the script omits `--sysroot`, and the build fails with `openssl/core.h: No such file or directory`.
+
+### Cross-compilation with another toolchain
 
 To cross-compile the provider for a different target architecture (e.g., ARM64), set the `CC` environment variable to your cross-compiler:
 
@@ -108,6 +148,12 @@ make BUILD=release
 
 After compilation, the shared library `stm32prov.so` will be created in the project root directory.
 
+Check that it was built for the target architecture:
+
+```bash
+file stm32prov.so    # expected for STM32MP2: ELF 64-bit LSB shared object, ARM aarch64
+```
+
 ### Cleaning
 
 To remove build artifacts:
@@ -115,6 +161,8 @@ To remove build artifacts:
 ```bash
 make clean
 ```
+
+Always run `make clean` when switching between native and cross builds, or between backends. Otherwise, stale object files from another architecture may be reused and the link fails with `file in wrong format`.
 
 ---
 
