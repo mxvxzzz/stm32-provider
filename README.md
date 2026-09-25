@@ -4,7 +4,7 @@ In OpenSSL terms, a provider is a unit of code that offers implementations for c
 
 STM32 Provider offloads cryptographic operations for security peripherals embedded in ST MPUs, through the Linux AF_ALG and Cryptodev.
 
-Here is a overviweuw of the CryptoAPI architecture, from User space to hardware :
+Here is an overview of the CryptoAPI architecture, from user space to hardware:
 
 ## CryptoAPI overview with STM32 Provider
 
@@ -23,7 +23,7 @@ This project uses:
 
 - **Entry Point (`prov.c`):** The main entry point that registers the provider and sets up the OpenSSL dispatch tables for the supported operations (Digests, Ciphers, etc.).
 
-- **Operation Layer (`digest/`, `hmac/`, `cipher/`,`aead/`):** Implements the standard OpenSSL interfaces (`newctx`, `init`, `update`, `final`) to dispatch algorithms.
+- **Operation Layer (`digest/`, `hmac/`, `cipher/`, `aead/`):** Implements the standard OpenSSL interfaces (`newctx`, `init`, `update`, `final`) to dispatch algorithms.
 
 - **Precompilation Switch:** A build-time configuration flag that selects the targeted Linux kernel API backend.
 
@@ -182,7 +182,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
 - Encrypt and decrypt a file using AES-192-ECB
 
-  For AES-192-ECB, the key size is 24 bytes (48 characters in hexa).
+  For AES-192-ECB, the key size is 24 bytes (48 characters in hex).
 
   Generate a random key: `export KEY=$(openssl rand -hex 24)`
 
@@ -200,7 +200,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
 - Encrypt and decrypt a file using AES-128-CBC
 
-  For AES-128-CBC, the key size is 16 bytes, (32 characters in hexa), the IV size is 16 bytes.
+  For AES-128-CBC, the key size is 16 bytes (32 characters in hex), and the IV size is 16 bytes.
 
   Generate a random key and IV:
 
@@ -222,7 +222,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
 - Encrypt and decrypt a file using AES-256-CTR
 
-  For AES-256-CTR, the key size is 32 bytes, (64 characters hexa).  
+  For AES-256-CTR, the key size is 32 bytes (64 characters in hex).  
 
   Generate a random key (same IV):
 
@@ -249,7 +249,7 @@ OpenSSL command-line tools accept provider options such as -provider and -provid
 
   👉 https://docs.openssl.org/3.3/man1/openssl-enc/#notes
 
-  To handle AEAD modes, OpenSSL EVP provide native support.
+  To handle AEAD modes, OpenSSL EVP provides native support.
   
   In this project, AEAD operations are handled with the dedicated `stmaead` tool.
 
