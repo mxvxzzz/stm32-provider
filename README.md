@@ -109,7 +109,16 @@ make BACKEND=cryptodev
 
 ### Cross-compilation with the ST OpenSTLinux SDK
 
-Source the SDK environment script. It sets `CC` (including `--sysroot`) and `PKG_CONFIG` for the target, so OpenSSL headers and `libcrypto` are taken from the target sysroot:
+Source the environment script matching the target architecture. For STM32MP1 (Cortex-A7, ARM32):
+
+```bash
+source <SDK_DIR>/environment-setup-cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi
+
+make clean
+make BACKEND=cryptodev      # or: make BACKEND=afalg
+```
+
+For STM32MP2 (Cortex-A35, AArch64), use its matching SDK environment script instead:
 
 ```bash
 source <SDK_DIR>/environment-setup-cortexa35-ostl-linux
@@ -117,6 +126,8 @@ source <SDK_DIR>/environment-setup-cortexa35-ostl-linux
 make clean
 make BACKEND=afalg          # or: make BACKEND=cryptodev
 ```
+
+The SDK script sets `CC` (including `--sysroot`) and `PKG_CONFIG`, so OpenSSL headers and `libcrypto` are taken from the target sysroot. Run `make clean` before switching architectures or backends: Make does not track changes to the compiler or build flags, and reusing an object file from a different target can make the linker fail with `file not recognized` or `file in wrong format`. `make clean` removes generated object and dependency files for both backends.
 
 ### Cross-compilation with another toolchain
 
@@ -147,18 +158,20 @@ After compilation, the shared library `stm32prov.so` will be created in the proj
 Check that it was built for the target architecture:
 
 ```bash
-file stm32prov.so    # expected for STM32MP2: ELF 64-bit LSB shared object, ARM aarch64
+file stm32prov.so
+# STM32MP1: ELF 32-bit LSB shared object, ARM, EABI5
+# STM32MP2: ELF 64-bit LSB shared object, ARM aarch64
 ```
 
 ### Cleaning
 
-To remove build artifacts:
+To remove generated object and dependency files:
 
 ```bash
 make clean
 ```
 
-Always run `make clean` when switching between native and cross builds, or between backends. Otherwise, stale object files from another architecture may be reused and the link fails with `file in wrong format`.
+The shared library `stm32prov.so` is intentionally kept by `make clean`. Run `make clean` when switching between native and cross builds, or between backends, to avoid reusing object files built for a different architecture or backend.
 
 ---
 
